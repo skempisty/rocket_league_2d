@@ -19,6 +19,7 @@ setInterval(function() {
 // DRAW
 function draw() {
   canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  carCollisionDetect();
   player1.draw();
   player2.draw();
 }
@@ -30,8 +31,8 @@ function update() {
 }
 
 // INITIALIZERS
-var initialPositionX = 0 ;
-var initialPositionY = 0;
+var initialPositionX = 50 ;
+var initialPositionY = 50;
 var initialRotation = 0;
 
 var player1 = {
@@ -126,6 +127,30 @@ KeyboardController({
   // down
     40: function() { player1.vel -= .1; }
 }, 50);
+
+
+function carCollisionDetect() {
+  var hitRadiusY = player1.height/2  *Math.cos(player1.rot*Math.PI/180);
+  var hitRadiusX = player1.width/2;
+  if (Math.abs(hitRadiusY) < player1.width/2) {
+    hitRadiusY = player1.width/2;
+  }
+  if (hitRadiusX < Math.abs(player1.height/2 * Math.sin(player1.rot*Math.PI/180))) {
+    hitRadiusX = player1.height/2*Math.sin(player1.rot*Math.PI/180);
+  }
+  // Hit check for left/right bounds
+  if (player1.xMid + hitRadiusX >= CANVAS_WIDTH || player1.xMid - hitRadiusX <= 0 ||
+      player1.xMid - hitRadiusX >= CANVAS_WIDTH || player1.xMid + hitRadiusX <= 0) {
+    player1.vel = 0;
+    return true;
+  }
+  // Hit check for top/bottom bounds
+  if (player1.yMid - hitRadiusY >= CANVAS_HEIGHT || player1.yMid + hitRadiusY >= CANVAS_HEIGHT ||
+      player1.yMid - hitRadiusY <= 0 || player1.yMid + hitRadiusY <= 0) {
+    player1.vel = 0;
+    return true;
+  }
+}
 
 
 
