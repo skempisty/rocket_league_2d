@@ -160,20 +160,34 @@ function carCollisionDetect() {
   arrayX = [northEastCorner[0], northWestCorner[0], southEastCorner[0], southWestCorner[0]];
   arrayY = [northEastCorner[1], northWestCorner[1], southEastCorner[1], southWestCorner[1]];
 
+  // Check X values
   for (var i=0; i < arrayX.length; i++) {
     if (arrayX[i] >= CANVAS_WIDTH) {
-      player1.vel = 0;
+      while (arrayX[i] >= CANVAS_WIDTH) {
+        player1.xMid -= 2;
+        draw();
+      }
     }
     if (arrayX[i] <= 0) {
-      player1.vel = 0;
+      while (arrayX[i] <= 0) {
+        player1.xMid += 2;
+        draw();
+      }
     }
   }
+  // Check Y values
   for (var i=0; i < arrayY.length; i++) {
     if (arrayY[i] >= CANVAS_HEIGHT) {
-      player1.vel = 0;
+      while (arrayY[i] >= CANVAS_HEIGHT) {
+        player1.yMid -= 2;
+        draw();
+      }
     }
     if (arrayY[i] <= 0) {
-      player1.vel = 0;
+      while (arrayY[i] <= 0) {
+        player1.yMid += 2;
+        draw();
+      }
     }
   }
 }
