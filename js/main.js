@@ -12,22 +12,23 @@ canvasElement.appendTo('body');
 // FPS SETTING
 var FPS = 60;
 setInterval(function() {
-  draw();
   update();
+  draw();
 }, 1000/FPS);
 
 // DRAW
 function draw() {
   canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  carCollisionDetect();
   player1.draw();
-  player2.draw();
+  ball.draw();
+  // player2.draw();
 }
 
 // UPDATE
 function update() {
   player1.xMid += (player1.vel * Math.sin(player1.rot*Math.PI/180));
   player1.yMid += -(player1.vel * Math.cos(player1.rot*Math.PI/180));
+  carWallCollisionDetect();
 }
 
 // INITIALIZERS
@@ -62,17 +63,31 @@ var player1 = {
 
 // Car 2
 
-var player2 = {
-  color: "orange",
-  x: initialPositionX,
-  y: initialPositionY,
-  width: 32,
-  height: 32,
+// var player2 = {
+//   color: "orange",
+//   x: initialPositionX,
+//   y: initialPositionY,
+//   width: 32,
+//   height: 32,
+//   draw: function() {
+//     canvas.fillStyle = this.color;
+//     canvas.fillRect(this.x, this.y, this.width, this.height);
+//   }
+// }
+
+var ball = {
+  color: "black",
+  x: CANVAS_WIDTH/2,
+  y: CANVAS_HEIGHT/2,
+  radius: 20,
+  vel: 0,
   draw: function() {
-    canvas.fillStyle = this.color;
-    canvas.fillRect(this.x, this.y, this.width, this.height);
+    canvas.beginPath();
+    canvas.arc(this.x, this.y, ball.radius, 0, 2*Math.PI);
+    canvas.stroke();
   }
 }
+
 
 function KeyboardController(keys, repeat) {
     // Lookup of key codes to timer ID, or null for no repeat
@@ -129,30 +144,30 @@ KeyboardController({
 }, 50);
 
 
-function carCollisionDetect() {
+function carWallCollisionDetect() {
   var northEastCorner, northWestCorner, southEastCorner, southWestCorner;
 
   var sinTheta = Math.sin(player1.rot*Math.PI/180);
   var cosTheta = Math.cos(player1.rot*Math.PI/180);
 
 
-//Actually SouthEast corner on canvas
+  //Actually SouthEast corner on canvas
   northEastCorner = [player1.xMid + ((player1.width/2)*cosTheta) - ((player1.height/2)*sinTheta),
                      player1.yMid + ((player1.width/2)*sinTheta) + ((player1.height/2)*cosTheta)
                      ];
 
-//Actually SouthWest corner on canvas
+  //Actually SouthWest corner on canvas
   northWestCorner = [player1.xMid + ((-player1.width/2)*cosTheta) - ((player1.height/2)*sinTheta),
                      player1.yMid + ((-player1.width/2)*sinTheta) + ((player1.height/2)*cosTheta)
                      ];
 
-//Actually NorthEast corner on canvas
+  //Actually NorthEast corner on canvas
   southEastCorner = [player1.xMid + ((player1.width/2)*cosTheta) - ((-player1.height/2)*sinTheta),
                      player1.yMid + ((player1.width/2)*sinTheta) + ((-player1.height/2)*cosTheta)
                      ];
 
 
-//Actually NorthWest corner on canvas
+  //Actually NorthWest corner on canvas
   southWestCorner = [player1.xMid + ((-player1.width/2)*cosTheta) - ((-player1.height/2)*sinTheta),
                      player1.yMid + ((- player1.width/2)*sinTheta) + ((-player1.height/2)*cosTheta)
                      ];
@@ -165,13 +180,13 @@ function carCollisionDetect() {
     if (arrayX[i] >= CANVAS_WIDTH) {
       while (arrayX[i] >= CANVAS_WIDTH) {
         player1.xMid -= 2;
-        draw();
+        carWallCollisionDetect();
       }
     }
     if (arrayX[i] <= 0) {
       while (arrayX[i] <= 0) {
         player1.xMid += 2;
-        draw();
+        carWallCollisionDetect();
       }
     }
   }
@@ -180,18 +195,22 @@ function carCollisionDetect() {
     if (arrayY[i] >= CANVAS_HEIGHT) {
       while (arrayY[i] >= CANVAS_HEIGHT) {
         player1.yMid -= 2;
-        draw();
+        carWallCollisionDetect();
       }
     }
     if (arrayY[i] <= 0) {
       while (arrayY[i] <= 0) {
         player1.yMid += 2;
-        draw();
+        carWallCollisionDetect();
       }
     }
   }
 }
 
+function ballCollision() {
+  // (x – h)2 + (y – k)2 = r2 || (h,k) = center
+  // Math.pow(x - ball.x, 2) + Math.pow(y - ball.y, 2) = Math.pow(ball.radius, 2)
+}
 
 
 
