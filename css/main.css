@@ -1,7 +1,45 @@
+
+body{
+background: url(../assets/fieldbackground.jpg);
+background-size: cover;
+background-position: center;
+}
+
 h1 {
   color: blue;
+  text-align: center;
 }
 
 canvas {
-  border: solid 1px black;
+  position: relative;
+  border: solid 3px white;
+  padding: 0;
+  margin: auto;
+  display: block;
+  background: url(../assets/2000px-Soccer_field_-_empty.svg.png);
+
+  background-size: 109.7% 107.7%;
+
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.center {
+  position: relative;
+  width: 25%;
+  margin: 0 auto;
+}
+
+.logo {
+  display: inline-block;
+  height: 100px;
+  width: auto;
+}
+
+.twod-logo {
+  display: inline-block;
+  position: relative;
+  top: -30px;
+  height: 35px;
+  width: auto;
 }

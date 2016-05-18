@@ -1,8 +1,8 @@
 console.log("linked!");
 
 // SET CANVAS SIZE AND APPEND TO BODY
-var CANVAS_WIDTH = 1000;
-var CANVAS_HEIGHT = 500;
+var CANVAS_WIDTH = 1100;
+var CANVAS_HEIGHT = 555;
 
 var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
                       "' height='" + CANVAS_HEIGHT + "'></canvas>");
@@ -14,6 +14,7 @@ function draw() {
   canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   ball.draw();
   player1.draw();
+
   // player2.draw();
 }
 
@@ -23,14 +24,16 @@ function update() {
   player1.yMid += -(player1.vel * Math.cos(player1.rot*Math.PI/180));
   ball.x += ball.velX;
   ball.y += ball.velY;
+  ballWallCollisionDetect();
   carWallCollisionDetect();
   carFrontBallCollision();
+  carRightBallCollision();
 }
 
 // INITIALIZERS
-var initialPositionX = 100;
-var initialPositionY = CANVAS_HEIGHT/2-25;
-var initialRotation = 90;
+var initialPositionX = CANVAS_WIDTH/2-12.5;
+var initialPositionY = CANVAS_HEIGHT/4*3-25;
+var initialRotation = 0;
 var thetaF = 0;
 
 var player1 = {
@@ -77,8 +80,8 @@ var ball = {
   x: CANVAS_WIDTH/2,
   y: CANVAS_HEIGHT/2,
   radius: 20,
-  velX: -1,
-  velY: 0,
+  velX: 0,
+  velY: 1,
   draw: function() {
     canvas.beginPath();
     canvas.arc(this.x, this.y, ball.radius, 0, 2*Math.PI);
@@ -209,6 +212,9 @@ function carWallCollisionDetect() {
   }
 }
 
+Math.roundTo = function(place, value) {
+  return Math.round(value * place) / place;
+}
 
 function frontFaceToBallCalc() {
   // Front face collision
@@ -251,24 +257,26 @@ function carFrontBallCollision() {
     var turnAngle = player1.rot*Math.PI/180;
     var bounceAngle = Math.atan(ball.velY / (ball.velX + player1.vel));
 
-    console.log("ball.velY = " + ball.velY);
-    console.log("ball.velX = " +ball.velX);
-    console.log("player1.vel = " +player1.vel);
-    console.log("______________________________");
 
-    if (ball.velY >= 0) {
-      velMag = math.hypot(ball.velY, (ball.velX + player1.vel));
-    } else {
-      velMag = ball.velX + player1.vel;
-    }
+    // if(player1.vel*Math.sin(player1.rot) > )
+      velMag = Math.hypot(ball.velY, (ball.velX + player1.vel));
+    // } else {
+    //   velMag = ball.velX + player1.vel;
+    // }
+    var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
+// console.log("ballvXINITIAL = " +ball.velX);
+    ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+    ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+// console.log("turnAngle= " + turnAngle);
+// console.log("bounceAngle" + bounceAngle);
+// console.log("resultAngle" + resultAngle);
+// console.log("velmag = " +velMag);
+// console.log("ballvXFINAL = " +ball.velX);
+// console.log("________________________________");
 
-    var resultAngle = turnAngle + bounceAngle + Math.PI/2;
 
-    ball.velX = (-velMag * Math.cos(Math.abs(resultAngle)));
-    ball.velY = (-velMag * Math.sin(Math.abs(resultAngle)));
-
-    ball.x += -velMag * Math.cos(resultAngle);
-    ball.y += -velMag * Math.sin(resultAngle);
+    ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+    ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
     /* CHANGE PLAYER SPEED REDUCTION AFTER HIT */
 
@@ -276,10 +284,98 @@ function carFrontBallCollision() {
   }
 }
 
+function rightFaceToBallCalc() {
+  // right face collision
+    var rightFaceVector = [arrayX[2] - arrayX[0], arrayY[2] - arrayY[0]];
+    var rightFaceMag = player1.height;
+    var rightFacePtv = [ball.x - arrayX[0], ball.y - arrayY[0]];
+    var unitRightFaceVector=[];
+    var projRightVect=[];
+    var closest=[];
+
+    for (var i=0; i<2; i++) {
+      unitRightFaceVector[i] = rightFaceVector[i]/rightFaceMag;
+    }
+
+    var projRightMag = math.dot(rightFacePtv, unitRightFaceVector);
+
+    if (projRightMag < 0) {
+      closest = [arrayX[2], arrayY[2]];
+    } else if (projRightMag > rightFaceMag) {
+      closest = [arrayX[0], arrayY[0]];
+    } else {
+      for (var i=0; i<2; i++) {
+        projRightVect[i] = projRightMag*unitRightFaceVector[i];
+      }
+      closest = [arrayX[0] + projRightVect[0] , arrayY[0] + projRightVect[1]];
+    }
+
+    var distVect = [ball.x - closest[0], ball.y - closest[1]];
+    var distMag = Math.hypot(distVect[0], distVect[1]);
+
+    return [distMag, projRightMag];
+}
+
+function carRightBallCollision() {
+  var rightFaceResult = rightFaceToBallCalc();
+  // if Contact on right face
+
+  if (rightFaceResult[0] < ball.radius) {
+
+    ball.color = "yellow";
+    // var velMag;
+    // var turnAngle = player1.rot*Math.PI/180;
+    // var bounceAngle = Math.atan(ball.velY / (ball.velX + player1.vel));
+
+    //   velMag = Math.hypot(ball.velY, (ball.velX + player1.vel));
+
+    // var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
+
+    // ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+    // ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+
+
+    // ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+    // ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+
+    /* CHANGE PLAYER SPEED REDUCTION AFTER HIT */
+
+    // player1.vel = player1.vel * .50;
+  }
+}
+
+function ballWallCollisionDetect() {
+  if (ball.x + ball.radius >= CANVAS_WIDTH) {
+    ball.velX = -ball.velX;
+    while (ball.x + ball.radius >= CANVAS_WIDTH) {
+      ball.x -= 2;
+    }
+  }
+  if (ball.x - ball.radius <= 0) {
+    ball.velX = -ball.velX;
+    while (ball.x - ball.radius <= 0) {
+      ball.x += 2;
+    }
+  }
+  if (ball.y + ball.radius >= CANVAS_HEIGHT) {
+    ball.velY = -ball.velY;
+    while (ball.y + ball.radius >= CANVAS_HEIGHT) {
+      ball.y -= 2;
+    }
+  }
+  if (ball.y - ball.radius <= 0) {
+    ball.velY = -ball.velY;
+    while (ball.y - ball.radius <= 0) {
+      ball.y += 2;
+    }
+  }
+}
+
+
 
 // FPS SETTING
-var FPS = 60;
+var FPS = 80;
 setInterval(function() {
   update();
-  draw();
+  requestAnimationFrame(draw);
 }, 1000/FPS);
