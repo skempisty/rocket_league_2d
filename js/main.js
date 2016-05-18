@@ -9,18 +9,11 @@ var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
 var canvas = canvasElement.get(0).getContext("2d");
 canvasElement.appendTo('body');
 
-// FPS SETTING
-var FPS = 60;
-setInterval(function() {
-  update();
-  draw();
-}, 1000/FPS);
-
 // DRAW
 function draw() {
   canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  player1.draw();
   ball.draw();
+  player1.draw();
   // player2.draw();
 }
 
@@ -28,13 +21,17 @@ function draw() {
 function update() {
   player1.xMid += (player1.vel * Math.sin(player1.rot*Math.PI/180));
   player1.yMid += -(player1.vel * Math.cos(player1.rot*Math.PI/180));
+  ball.x += ball.velX;
+  ball.y += ball.velY;
   carWallCollisionDetect();
+  carFrontBallCollision();
 }
 
 // INITIALIZERS
-var initialPositionX = 50;
-var initialPositionY = 50;
-var initialRotation = 0;
+var initialPositionX = 100;
+var initialPositionY = CANVAS_HEIGHT/2-25;
+var initialRotation = 90;
+var thetaF = 0;
 
 var player1 = {
   color: "dodgerblue",
@@ -80,10 +77,13 @@ var ball = {
   x: CANVAS_WIDTH/2,
   y: CANVAS_HEIGHT/2,
   radius: 20,
-  vel: 0,
+  velX: -1,
+  velY: 0,
   draw: function() {
     canvas.beginPath();
     canvas.arc(this.x, this.y, ball.radius, 0, 2*Math.PI);
+    canvas.fillStyle = this.color;
+    canvas.fill();
     canvas.stroke();
   }
 }
@@ -143,9 +143,11 @@ KeyboardController({
     40: function() { player1.vel -= .1; }
 }, 50);
 
+// Define CORNERS
+  var northEastCorner, northWestCorner, southEastCorner, southWestCorner;
+  var arrayX, arrayY;
 
 function carWallCollisionDetect() {
-  var northEastCorner, northWestCorner, southEastCorner, southWestCorner;
 
   var sinTheta = Math.sin(player1.rot*Math.PI/180);
   var cosTheta = Math.cos(player1.rot*Math.PI/180);
@@ -207,32 +209,77 @@ function carWallCollisionDetect() {
   }
 }
 
-function ballCollision() {
-  // (x – h)2 + (y – k)2 = r2 || (h,k) = center
-  // Math.pow(x - ball.x, 2) + Math.pow(y - ball.y, 2) = Math.pow(ball.radius, 2)
+
+function frontFaceToBallCalc() {
+  // Front face collision
+    var frontFaceVector = [arrayX[2] - arrayX[3], arrayY[2] - arrayY[3]];
+    var frontFaceMag = player1.width;
+    var frontFacePtv = [ball.x - arrayX[3], ball.y - arrayY[3]];
+    var unitFrontFaceVector=[];
+    var projFrontVect=[];
+    var closest=[];
+
+    for (var i=0; i<2; i++) {
+      unitFrontFaceVector[i] = frontFaceVector[i]/frontFaceMag;
+    }
+
+    var projFrontMag = math.dot(frontFacePtv, unitFrontFaceVector);
+
+    if (projFrontMag < 0) {
+      closest = [arrayX[2], arrayY[2]];
+    } else if (projFrontMag > frontFaceMag) {
+      closest = [arrayX[3], arrayY[3]];
+    } else {
+      for (var i=0; i<2; i++) {
+        projFrontVect[i] = projFrontMag*unitFrontFaceVector[i];
+      }
+      closest = [arrayX[3] + projFrontVect[0] , arrayY[3] + projFrontVect[1]];
+    }
+
+    var distVect = [ball.x - closest[0], ball.y - closest[1]];
+    var distMag = math.hypot(distVect[0], distVect[1]);
+
+    return [distMag, projFrontMag];
+}
+
+function carFrontBallCollision() {
+  var frontFaceResult = frontFaceToBallCalc();
+  // if Contact
+
+  if (frontFaceResult[0] < ball.radius) {
+    var velMag;
+    var turnAngle = player1.rot*Math.PI/180;
+    var bounceAngle = Math.atan(ball.velY / (ball.velX + player1.vel));
+
+    console.log("ball.velY = " + ball.velY);
+    console.log("ball.velX = " +ball.velX);
+    console.log("player1.vel = " +player1.vel);
+    console.log("______________________________");
+
+    if (ball.velY >= 0) {
+      velMag = math.hypot(ball.velY, (ball.velX + player1.vel));
+    } else {
+      velMag = ball.velX + player1.vel;
+    }
+
+    var resultAngle = turnAngle + bounceAngle + Math.PI/2;
+
+    ball.velX = (-velMag * Math.cos(Math.abs(resultAngle)));
+    ball.velY = (-velMag * Math.sin(Math.abs(resultAngle)));
+
+    ball.x += -velMag * Math.cos(resultAngle);
+    ball.y += -velMag * Math.sin(resultAngle);
+
+    /* CHANGE PLAYER SPEED REDUCTION AFTER HIT */
+
+    player1.vel = player1.vel * .50;
+  }
 }
 
 
-
-
-
-  // var hitRadiusY = player1.height/2  *Math.cos(player1.rot*Math.PI/180);
-  // var hitRadiusX = player1.width/2;
-  // if (Math.abs(hitRadiusY) < player1.width/2) {
-  //   hitRadiusY = player1.width/2;
-  // }
-  // if (hitRadiusX < Math.abs(player1.height/2 * Math.sin(player1.rot*Math.PI/180))) {
-  //   hitRadiusX = player1.height/2*Math.sin(player1.rot*Math.PI/180);
-  // }
-  // // Hit check for left/right bounds
-  // if (player1.xMid + hitRadiusX >= CANVAS_WIDTH || player1.xMid - hitRadiusX <= 0 ||
-  //     player1.xMid - hitRadiusX >= CANVAS_WIDTH || player1.xMid + hitRadiusX <= 0) {
-  //   player1.vel = 0;
-  //   return true;
-  // }
-  // // Hit check for top/bottom bounds
-  // if (player1.yMid - hitRadiusY >= CANVAS_HEIGHT || player1.yMid + hitRadiusY >= CANVAS_HEIGHT ||
-  //     player1.yMid - hitRadiusY <= 0 || player1.yMid + hitRadiusY <= 0) {
-  //   player1.vel = 0;
-  //   return true;
-  // }
+// FPS SETTING
+var FPS = 60;
+setInterval(function() {
+  update();
+  draw();
+}, 1000/FPS);
