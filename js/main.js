@@ -290,7 +290,7 @@ function carFrontBallCollision(outputFromFrontFaceToBallCalc) {
 
     // IF CONTACT OCCURS
     if (frontFaceResult < ball.radius) {
-      // ball.color = "white";
+      $('.ball-hit').trigger("play");
       var velMag;
       var turnAngle = players[i].rot*Math.PI/180;
       var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
@@ -306,7 +306,9 @@ function carFrontBallCollision(outputFromFrontFaceToBallCalc) {
       ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-      players[i].vel *= .50;
+      if (players[i].vel > 1.5) {
+        players[i].vel *= .50;
+      }
     }
   }
 }
@@ -354,7 +356,7 @@ function carRightBallCollision(outputFromRightFaceToBallCalc) {
 
     // IF CONTACT OCCURS
     if (rightFaceResult < ball.radius) {
-      // ball.color = "red";
+      $('.ball-hit').trigger("play");
       var velMag;
       var turnAngle = players[i].rot*Math.PI/180;
       var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
@@ -418,7 +420,7 @@ function carLeftBallCollision(outputFromLeftFaceToBallCalc) {
 
     // IF CONTACT OCCURS
     if (leftFaceResult < ball.radius) {
-      // ball.color = "lime";
+      $('.ball-hit').trigger("play");
       var velMag;
       var turnAngle = players[i].rot*Math.PI/180;
       var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
@@ -482,7 +484,7 @@ function carBottomBallCollision(outputFromBottomFaceToBallCalc) {
 
     // IF CONTACT OCCURS
     if (bottomFaceResult < ball.radius) {
-      // ball.color = "blue";
+      $('.ball-hit').trigger("play");
       var velMag;
       var turnAngle = players[i].rot*Math.PI/180;
       var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
