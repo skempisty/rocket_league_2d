@@ -1,8 +1,18 @@
 
 body{
-background: url(../assets/fieldbackground.jpg);
-background-size: cover;
-background-position: center;
+  background: url(../assets/fieldbackground.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+@font-face {
+    font-family: 'planerregular';
+    src: url('Planer-Regular-webfont.eot');
+    src: url('Planer-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../assets/Planer-Regular-webfont.ttf') format('truetype'),
+         url('Planer-Regular-webfont.svg#planerregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 
 h1 {
@@ -17,17 +27,17 @@ canvas {
   margin: auto;
   display: block;
   background: url(../assets/2000px-Soccer_field_-_empty.svg.png);
-
   background-size: 109.7% 107.7%;
-
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .center {
   position: relative;
-  width: 25%;
-  margin: 0 auto;
+  width: 70%;
+  margin: -5px auto;
+  text-align: center;
+  height: 60%;
 }
 
 .logo {
@@ -42,4 +52,50 @@ canvas {
   top: -30px;
   height: 35px;
   width: auto;
+}
+
+.scoreboard {
+  position: relative;
+  top: -20px;
+  display: inline-block;
+  height: 50px;
+  width: 60px;
+  border: solid 4px black;
+  font-size: 300%;
+  text-align: center;
+  font-family: 'planerregular';
+  color: white;
+  text-shadow: 2px 2px black;;
+  padding-bottom: 10px;
+}
+
+.orange {
+  background: orange;
+  border-left: solid 2px white;
+  border-bottom: solid 2px white;
+  border-top: solid 2px white;
+}
+
+.blue {
+  background: blue;
+  border-right: solid 2px white;
+  border-bottom: solid 2px white;
+  border-top: solid 2px white;
+}
+
+.spacer {
+  width: 0px;
+  display: inline-block;
+}
+
+.logo-timer {
+  display: inline-block;
+  position: relative;
+  background: black;
+  padding: 0px 30px 0px 30px;
+  border-radius: 5%;
+}
+
+.hidden {
+  display: none;
 }

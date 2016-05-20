@@ -1,7 +1,7 @@
 console.log("linked!");
 
 // SET CANVAS SIZE AND APPEND TO BODY
-var CANVAS_WIDTH = 1100;
+var CANVAS_WIDTH = 1200;
 var CANVAS_HEIGHT = 555;
 
 var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
@@ -9,11 +9,16 @@ var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
 var canvas = canvasElement.get(0).getContext("2d");
 canvasElement.appendTo('body');
 var players = [];
-
+var scoreOrange = 0;
+var scoreBlue = 0;
 
 // DRAW
 function draw() {
   canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  canvas.fillStyle = "rgba(255, 120, 0, .7)";
+  canvas.fillRect(0,0,CANVAS_WIDTH/2,CANVAS_HEIGHT);
+  canvas.fillStyle = "rgba(0, 0, 255, .5)";
+  canvas.fillRect(CANVAS_WIDTH/2,0,CANVAS_WIDTH/2,CANVAS_HEIGHT);
   for (var i=0; i<players.length; i++) {
     players[i].draw();
   }
@@ -22,46 +27,22 @@ function draw() {
 
 // UPDATE
 function update() {
-
   for(var i=0; i < players.length; i++) {
     players[i].xMid += (players[i].vel * Math.sin(players[i].rot*Math.PI/180));
     players[i].yMid += -(players[i].vel * Math.cos(players[i].rot*Math.PI/180));
   }
 
-  if (ball.velX < -3) {
-    ball.velX = -3;
-    ball.x += ball.velX;
-  } else {
-    ball.x += ball.velX;
-  }
-  if (ball.velY < -3) {
-    ball.velX = -3;
-    ball.x += ball.velX;
-  } else {
-    ball.x += ball.velX;
-  }
+  ball.x += ball.velX;
+  ball.y += ball.velY;
 
-  if (ball.velX > 3) {
-    ball.velX = 3;
-    ball.x += ball.velX;
-  } else {
-    ball.x += ball.velX;
-  }
-  if (ball.velY > 3) {
-    ball.velY = 3;
-    ball.y += ball.velY;
-  } else {
-    ball.y += ball.velY;
-  }
-
-  ballWallCollisionDetect();
+  ballWallCollisionDetect(180);
   carWallCollisionDetect();
   carFrontBallCollision(frontFaceToBallCalc(players));
   carRightBallCollision(rightFaceToBallCalc(players));
   carLeftBallCollision(leftFaceToBallCalc(players));
   carBottomBallCollision(bottomFaceToBallCalc(players));
 
-  console.log("ballVelX = " + ball.velX + "   ballVelY = " + ball.velY);
+  console.log("speed p1 = " + players[0].vel);
 }
 
 /* PLAYER CONSTRUCTOR */
@@ -88,12 +69,6 @@ function Player(color, xInitial, yInitial, rotInitial) {
   }
 }
 
-/* CREATE TWO PLAYERS */
-
-player1 = new Player("dodgerblue", CANVAS_WIDTH/4-45/2, CANVAS_HEIGHT/2-75/2, 90);
-player2 = new Player("orange", CANVAS_WIDTH/4*3-45/2, CANVAS_HEIGHT/2-75/2, -90);
-players.push(player1, player2);
-
 /* DEFINE BALL OBJECT */
 
 var ball = {
@@ -111,6 +86,23 @@ var ball = {
     canvas.stroke();
   }
 }
+
+/* CREATE/RESET PLAYERS AND BALL */
+
+function resetGame() {
+  canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  players = [];
+  player1 = new Player("dodgerblue", CANVAS_WIDTH/9-45/2, CANVAS_HEIGHT/2-75/2, 90);
+  player2 = new Player("orange", CANVAS_WIDTH/9*8-45/2, CANVAS_HEIGHT/2-75/2, -90);
+  players.push(player1, player2);
+  ball.x = CANVAS_WIDTH/2;
+  ball.y = CANVAS_HEIGHT/2;
+  ball.velX = 0;
+  ball.velY = 0;
+  ball.draw();
+}
+// Calls resetGame to initialize game
+resetGame();
 
 
 function KeyboardController(keys, repeat) {
@@ -156,23 +148,23 @@ function KeyboardController(keys, repeat) {
 
 KeyboardController({
   // PLAYER 1 CONTROLS
-  // left
-    37: function() { players[0].rot -= 8; },
-  // up
-    38: function() { players[0].vel += .1; },
-  // right
-    39: function() { players[0].rot += 8; },
-  // down
-    40: function() { players[0].vel -= .1; },
-  // PLAYER 2 CONTROLS
   // A
-    65: function() { players[1].rot -= 8; },
+    65: function() { players[0].rot -= 10; },
   // W
-    87: function() { players[1].vel += .1; },
+    87: function() { players[0].vel < 4 ? players[0].vel += .15 : players[0].vel = players[0].vel; },
   // D
-    68: function() { players[1].rot += 8; },
+    68: function() { players[0].rot += 10; },
   // S
-    83: function() { players[1].vel -= .1; },
+    83: function() { players[0].vel > -2.5 ? players[0].vel -= .25 : players[0].vel = players[0].vel; },
+  // PLAYER 2 CONTROLS
+  // left
+    37: function() { players[1].rot -= 10; },
+  // up
+    38: function() { players[1].vel < 4 ? players[1].vel += .15 : players[1].vel = players[1].vel; },
+  // right
+    39: function() { players[1].rot += 10; },
+  // down
+    40: function() { players[1].vel > -2.5 ? players[1].vel -= .25 : players[1].vel = players[1].vel; },
 }, 50);
 
 // Define CORNERS
@@ -369,7 +361,7 @@ function carRightBallCollision(outputFromRightFaceToBallCalc) {
 
       velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
+      var resultAngle = turnAngle + bounceAngle  + Math.PI;
 
       ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
@@ -378,7 +370,7 @@ function carRightBallCollision(outputFromRightFaceToBallCalc) {
       ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-      players[i].vel *= .8;
+      players[i].vel *= .9;
     }
   }
 }
@@ -433,7 +425,7 @@ function carLeftBallCollision(outputFromLeftFaceToBallCalc) {
 
       velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
+      var resultAngle = turnAngle + bounceAngle;
 
       ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
@@ -442,7 +434,7 @@ function carLeftBallCollision(outputFromLeftFaceToBallCalc) {
       ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-      players[i].vel *= .8;
+      players[i].vel *= .9;
     }
   }
 }
@@ -497,31 +489,62 @@ function carBottomBallCollision(outputFromBottomFaceToBallCalc) {
 
       velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
+      var resultAngle = turnAngle + bounceAngle  - Math.PI/2;
 
-      ball.velX = velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-      players[i].vel *= .8;
+      players[i].vel *= .9;
     }
   }
 }
 
-function ballWallCollisionDetect() {
+function ballWallCollisionDetect(bound) {
   if (ball.x + ball.radius >= CANVAS_WIDTH) {
-    ball.velX = -ball.velX;
-    while (ball.x + ball.radius >= CANVAS_WIDTH) {
-      ball.x -= 2;
+    // If BALL ENTERS RIGHT GOAL
+    if (ball.y + ball.radius <= CANVAS_HEIGHT - bound && ball.y - ball.radius >= bound) {
+
+      // GIVE POINT
+      scoreOrange++;
+      $('.orange').text(scoreOrange);
+      // CUE CELEBRATION ANIMATION
+      $('.goal-impact').trigger("play");
+      $('.goal-horn').trigger("play");
+      // RESET STATE
+      resetGame();
+
+    } else {
+      ball.velX = -ball.velX;
+      while (ball.x + ball.radius >= CANVAS_WIDTH) {
+        ball.x -= 2;
+      }
+      ball.velX += .5;
     }
   }
   if (ball.x - ball.radius <= 0) {
-    ball.velX = -ball.velX;
-    while (ball.x - ball.radius <= 0) {
-      ball.x += 2;
+    // If BALL ENTERS LEFT GOAL
+    if (ball.y + ball.radius <= CANVAS_HEIGHT - bound && ball.y - ball.radius >= bound) {
+
+      // GIVE POINT
+      scoreBlue++;
+      $('.blue').text(scoreBlue);
+      // CUE CELEBRATION ANIMATION
+      $('.goal-impact').trigger("play");
+      $('.goal-horn').trigger("play");
+      // RESET STATE
+      resetGame();
+
+
+    } else {
+      ball.velX = -ball.velX;
+      while (ball.x - ball.radius <= 0) {
+        ball.x += 2;
+      }
+      ball.velX -= .5;
     }
   }
   if (ball.y + ball.radius >= CANVAS_HEIGHT) {
@@ -529,26 +552,43 @@ function ballWallCollisionDetect() {
     while (ball.y + ball.radius >= CANVAS_HEIGHT) {
       ball.y -= 2;
     }
+    ball.velY += .5;
   }
   if (ball.y - ball.radius <= 0) {
     ball.velY = -ball.velY;
     while (ball.y - ball.radius <= 0) {
       ball.y += 2;
     }
+    ball.velY -= .5;
   }
 }
 
 /* BALL SPEED DECAY */
 function ballFriction(friction) {
-  if (Math.hypot(ball.velX, ball.velY) > .5) {
+  if (Math.hypot(ball.velX, ball.velY) > .1) {
     ball.velX -= ball.velX*friction;
     ball.velY -= ball.velY*friction;
   }
 }
 
-// // SPEED DECAY FUNCTION CALL
+function carFriction(friction) {
+  for (var i=0; i < players.length; i++) {
+    if (players[i].vel > 0) {
+      players[i].vel -= players[i].vel*friction;
+    }
+  }
+}
+
+// SPEED DECAY FUNCTION CALL
 setInterval(function() {
-  ballFriction(.2)}, 600);
+  ballFriction(.1);
+  carFriction(.1);
+}, 500);
+
+// TIMER ACTION
+// setInterval(function() {
+
+// }, 1000);
 
 // FPS SETTING
 var FPS = 60;
@@ -557,12 +597,16 @@ setInterval(function() {
   requestAnimationFrame(draw);
 }, 1000/FPS);
 
+/* DOM INTERACTION */
+
+$('.orange').text(scoreOrange);
+$('.blue').text(scoreBlue);
 
 
 
 /* CORNER HIT DETECTION */
 
-// TAKES ARRAY corner AND TESTS IF IT IS WITHIN THE BALL
+//TAKES ARRAY corner AND TESTS IF IT IS WITHIN THE BALL
 // function testCornerInBall(corner) {
 //   // corner[0] = x
 //   // corner[1] = y
@@ -576,6 +620,16 @@ setInterval(function() {
 // }
 
 // /* CORNER HIT RESPONSE */
+
+// function cornerHitResponse() {
+//   for (var i=0; i < players.length; i++) {
+//     if (testCornerInBall(players[i].northWestCorner) || testCornerInBall(players[i].northEastCorner) ||
+//         testCornerInBall(players[i].southWestCorner) || testCornerInBall(players[i].southEastCorner)) {
+//       ball.velX = -ball.velX*Math.atan;
+//       ball.velY = -ball.velY;
+//     }
+//   }
+// }
 
 // function northEastCornerHit() {
 //   if (testCornerInBall(southEastCorner)) {
