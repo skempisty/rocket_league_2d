@@ -47,7 +47,7 @@ function update() {
 
 /* PLAYER CONSTRUCTOR */
 
-function Player(color, xInitial, yInitial, rotInitial) {
+function Player(color, xInitial, yInitial, rotInitial, colorPath) {
   this.color = color;
   this.x = xInitial;
   this.y = yInitial;
@@ -59,7 +59,7 @@ function Player(color, xInitial, yInitial, rotInitial) {
   this.yMid = this.y + this.height/2;
   this.draw = function() {
     var drawing = new Image();
-    drawing.src = "assets/Car.png";
+    drawing.src = colorPath;
 
     canvas.save();
     canvas.translate(this.xMid, this.yMid);
@@ -92,8 +92,8 @@ var ball = {
 function resetGame() {
   canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   players = [];
-  player1 = new Player("dodgerblue", CANVAS_WIDTH/9-45/2, CANVAS_HEIGHT/2-75/2, 90);
-  player2 = new Player("orange", CANVAS_WIDTH/9*8-45/2, CANVAS_HEIGHT/2-75/2, -90);
+  player1 = new Player("dodgerblue", CANVAS_WIDTH/9-45/2, CANVAS_HEIGHT/2-75/2, 90, "assets/Car_orange.png");
+  player2 = new Player("orange", CANVAS_WIDTH/9*8-45/2, CANVAS_HEIGHT/2-75/2, -90, "assets/Car_blue.png");
   players.push(player1, player2);
   ball.x = CANVAS_WIDTH/2;
   ball.y = CANVAS_HEIGHT/2;
