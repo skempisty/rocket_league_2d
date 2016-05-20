@@ -8,11 +8,15 @@ var canvasElement = $("<canvas width='" + CANVAS_WIDTH +
                       "' height='" + CANVAS_HEIGHT + "'></canvas>");
 var canvas = canvasElement.get(0).getContext("2d");
 canvasElement.appendTo('body');
+var players = [];
+
 
 // DRAW
 function draw() {
   canvas.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  player1.draw();
+  for (var i=0; i<players.length; i++) {
+    players[i].draw();
+  }
   ball.draw();
 
   // player2.draw();
@@ -20,67 +24,62 @@ function draw() {
 
 // UPDATE
 function update() {
-  player1.xMid += (player1.vel * Math.sin(player1.rot*Math.PI/180));
-  player1.yMid += -(player1.vel * Math.cos(player1.rot*Math.PI/180));
 
-if (ball.velX < -3) {
-  ball.velX = -3;
-  ball.x += ball.velX;
-} else {
-  ball.x += ball.velX;
-}
-if (ball.velY < -3) {
-  ball.velX = -3;
-  ball.x += ball.velX;
-} else {
-  ball.x += ball.velX;
-}
+  for(var i=0; i < players.length; i++) {
+    players[i].xMid += (players[i].vel * Math.sin(players[i].rot*Math.PI/180));
+    players[i].yMid += -(players[i].vel * Math.cos(players[i].rot*Math.PI/180));
+  }
 
-if (ball.velX > 3) {
-  ball.velX = 3;
-  ball.x += ball.velX;
-} else {
-  ball.x += ball.velX;
-}
-if (ball.velY > 3) {
-  ball.velY = 3;
-  ball.y += ball.velY;
-} else {
-  ball.y += ball.velY;
-}
+  if (ball.velX < -3) {
+    ball.velX = -3;
+    ball.x += ball.velX;
+  } else {
+    ball.x += ball.velX;
+  }
+  if (ball.velY < -3) {
+    ball.velX = -3;
+    ball.x += ball.velX;
+  } else {
+    ball.x += ball.velX;
+  }
+
+  if (ball.velX > 3) {
+    ball.velX = 3;
+    ball.x += ball.velX;
+  } else {
+    ball.x += ball.velX;
+  }
+  if (ball.velY > 3) {
+    ball.velY = 3;
+    ball.y += ball.velY;
+  } else {
+    ball.y += ball.velY;
+  }
 
   ballWallCollisionDetect();
   carWallCollisionDetect();
-  carFrontBallCollision();
-  carRightBallCollision();
-  carLeftBallCollision();
-  carBottomBallCollision();
-  northEastCornerHit();
-  northWestCornerHit();
-  southEastCornerHit();
-  southWestCornerHit();
+  carFrontBallCollision(frontFaceToBallCalc(players));
+  carRightBallCollision(rightFaceToBallCalc(players));
+  carLeftBallCollision(leftFaceToBallCalc(players));
+  carBottomBallCollision(bottomFaceToBallCalc(players));
 }
 
 // INITIALIZERS
-var initialPositionX = CANVAS_WIDTH/4-12.5;
-var initialPositionY = CANVAS_HEIGHT/2-25;
-var initialRotation = 90;
 var thetaF = 0;
 
-var player1 = {
-  color: "dodgerblue",
-  x: initialPositionX,
-  y: initialPositionY,
-  rot: initialRotation,
-  vel: 0,
-  width: 45,
-  height: 75,
-  init: function() {
-    this.xMid = this.x + this.width/2;
-    this.yMid = this.y + this.height/2;
-    return this;
-  },
-  draw: function() {
+/* PLAYER CONSTRUCTOR */
+
+function Player(color, xInitial, yInitial, rotInitial) {
+  this.color = color;
+  this.x = xInitial;
+  this.y = yInitial;
+  this.rot = rotInitial;
+  this.vel = 0;
+  this.width = 45;
+  this.height = 75;
+  this.xMid = this.x + this.width/2;
+  this.yMid = this.y + this.height/2;
+  this.draw = function() {
     var drawing = new Image();
     drawing.src = "assets/Car.png";
 
@@ -90,21 +89,15 @@ var player1 = {
     canvas.drawImage(drawing, -this.width/2, -this.height/2,this.width,this.height);
     canvas.restore();
   }
-}.init();
+}
 
-// Car 2
+/* CREATE TWO PLAYERS */
 
-// var player2 = {
-//   color: "orange",
-//   x: initialPositionX,
-//   y: initialPositionY,
-//   width: 32,
-//   height: 32,
-//   draw: function() {
-//     canvas.fillStyle = this.color;
-//     canvas.fillRect(this.x, this.y, this.width, this.height);
-//   }
-// }
+player1 = new Player("dodgerblue", CANVAS_WIDTH/4-45/2, CANVAS_HEIGHT/2-75/2, 90);
+player2 = new Player("orange", CANVAS_WIDTH/4*3-45/2, CANVAS_HEIGHT/2-75/2, -90);
+players.push(player1, player2);
+
+/* DEFINE BALL OBJECT */
 
 var ball = {
   color: "black",
@@ -167,14 +160,24 @@ function KeyboardController(keys, repeat) {
 };
 
 KeyboardController({
+  // PLAYER 1 CONTROLS
   // left
-    37: function() { player1.rot -= 8; },
+    37: function() { players[0].rot -= 8; },
   // up
-    38: function() { player1.vel += .1; },
+    38: function() { players[0].vel += .1; },
   // right
-    39: function() { player1.rot += 8; },
+    39: function() { players[0].rot += 8; },
   // down
-    40: function() { player1.vel -= .1; }
+    40: function() { players[0].vel -= .1; },
+  // PLAYER 2 CONTROLS
+  // A
+    65: function() { players[1].rot -= 8; },
+  // W
+    87: function() { players[1].vel += .1; },
+  // D
+    68: function() { players[1].rot += 8; },
+  // S
+    83: function() { players[1].vel -= .1; },
 }, 50);
 
 // Define CORNERS
@@ -183,61 +186,63 @@ KeyboardController({
 
 function carWallCollisionDetect() {
 
-  var sinTheta = Math.sin(player1.rot*Math.PI/180);
-  var cosTheta = Math.cos(player1.rot*Math.PI/180);
+  for (var i=0; i<players.length; i++) {
+    var sinTheta = Math.sin(players[i].rot*Math.PI/180);
+    var cosTheta = Math.cos(players[i].rot*Math.PI/180);
 
 
-  //Actually SouthEast corner on canvas
-  northEastCorner = [player1.xMid + ((player1.width/2)*cosTheta) - ((player1.height/2)*sinTheta),
-                     player1.yMid + ((player1.width/2)*sinTheta) + ((player1.height/2)*cosTheta)
-                     ];
+    //Actually SouthEast corner on canvas
+    players[i].southEastCorner = [players[i].xMid + ((players[i].width/2)*cosTheta) - ((players[i].height/2)*sinTheta),
+                       players[i].yMid + ((players[i].width/2)*sinTheta) + ((players[i].height/2)*cosTheta)
+                       ];
 
-  //Actually SouthWest corner on canvas
-  northWestCorner = [player1.xMid + ((-player1.width/2)*cosTheta) - ((player1.height/2)*sinTheta),
-                     player1.yMid + ((-player1.width/2)*sinTheta) + ((player1.height/2)*cosTheta)
-                     ];
+    //Actually SouthWest corner on canvas
+    players[i].southWestCorner = [players[i].xMid + ((-players[i].width/2)*cosTheta) - ((players[i].height/2)*sinTheta),
+                       players[i].yMid + ((-players[i].width/2)*sinTheta) + ((players[i].height/2)*cosTheta)
+                       ];
 
-  //Actually NorthEast corner on canvas
-  southEastCorner = [player1.xMid + ((player1.width/2)*cosTheta) - ((-player1.height/2)*sinTheta),
-                     player1.yMid + ((player1.width/2)*sinTheta) + ((-player1.height/2)*cosTheta)
-                     ];
+    //Actually NorthEast corner on canvas
+    players[i].northEastCorner = [players[i].xMid + ((players[i].width/2)*cosTheta) - ((-players[i].height/2)*sinTheta),
+                       players[i].yMid + ((players[i].width/2)*sinTheta) + ((-players[i].height/2)*cosTheta)
+                       ];
 
 
-  //Actually NorthWest corner on canvas
-  southWestCorner = [player1.xMid + ((-player1.width/2)*cosTheta) - ((-player1.height/2)*sinTheta),
-                     player1.yMid + ((- player1.width/2)*sinTheta) + ((-player1.height/2)*cosTheta)
-                     ];
+    //Actually NorthWest corner on canvas
+    players[i].northWestCorner = [players[i].xMid + ((-players[i].width/2)*cosTheta) - ((-players[i].height/2)*sinTheta),
+                       players[i].yMid + ((- players[i].width/2)*sinTheta) + ((-players[i].height/2)*cosTheta)
+                       ];
 
-  arrayX = [northEastCorner[0], northWestCorner[0], southEastCorner[0], southWestCorner[0]];
-  arrayY = [northEastCorner[1], northWestCorner[1], southEastCorner[1], southWestCorner[1]];
+    players[i].arrayX = [players[i].northEastCorner[0], players[i].northWestCorner[0], players[i].southEastCorner[0], players[i].southWestCorner[0]];
+    players[i].arrayY = [players[i].northEastCorner[1], players[i].northWestCorner[1], players[i].southEastCorner[1], players[i].southWestCorner[1]];
 
-  // Check X values
-  for (var i=0; i < arrayX.length; i++) {
-    if (arrayX[i] >= CANVAS_WIDTH) {
-      while (arrayX[i] >= CANVAS_WIDTH) {
-        player1.xMid -= 2;
-        carWallCollisionDetect();
+    // Check X values
+    for (var j=0; j < players[i].arrayX.length; j++) {
+      if (players[i].arrayX[j] >= CANVAS_WIDTH) {
+        while (players[i].arrayX[j] >= CANVAS_WIDTH) {
+          players[i].xMid -= 2;
+          carWallCollisionDetect();
+        }
+      }
+      if (players[i].arrayX[j] <= 0) {
+        while (players[i].arrayX[j] <= 0) {
+          players[i].xMid += 2;
+          carWallCollisionDetect();
+        }
       }
     }
-    if (arrayX[i] <= 0) {
-      while (arrayX[i] <= 0) {
-        player1.xMid += 2;
-        carWallCollisionDetect();
+    // Check Y values
+    for (var j=0; j < players[i].arrayY.length; j++) {
+      if (players[i].arrayY[j] >= CANVAS_HEIGHT) {
+        while (players[i].arrayY[j] >= CANVAS_HEIGHT) {
+          players[i].yMid -= 2;
+          carWallCollisionDetect();
+        }
       }
-    }
-  }
-  // Check Y values
-  for (var i=0; i < arrayY.length; i++) {
-    if (arrayY[i] >= CANVAS_HEIGHT) {
-      while (arrayY[i] >= CANVAS_HEIGHT) {
-        player1.yMid -= 2;
-        carWallCollisionDetect();
-      }
-    }
-    if (arrayY[i] <= 0) {
-      while (arrayY[i] <= 0) {
-        player1.yMid += 2;
-        carWallCollisionDetect();
+      if (players[i].arrayY[j] <= 0) {
+        while (players[i].arrayY[j] <= 0) {
+          players[i].yMid += 2;
+          carWallCollisionDetect();
+        }
       }
     }
   }
@@ -247,260 +252,259 @@ Math.roundTo = function(place, value) {
   return Math.round(value * place) / place;
 }
 
-function frontFaceToBallCalc() {
-  // Front face collision
-    var frontFaceVector = [arrayX[2] - arrayX[3], arrayY[2] - arrayY[3]];
-    var frontFaceMag = player1.width;
-    var frontFacePtv = [ball.x - arrayX[3], ball.y - arrayY[3]];
+// PASS IN players[], returns perpendicular distance of both players from face to ball center
+function frontFaceToBallCalc(playerArray) {
+  var distVect = [];
+  var distMag = [];
+  for (var i=0; i < playerArray.length; i++) {
+    var frontFaceVector = [playerArray[i].arrayX[0] - playerArray[i].arrayX[1], playerArray[i].arrayY[0] - playerArray[i].arrayY[1]];
+    var frontFaceMag = playerArray[i].width;
+    var frontFacePtv = [ball.x - playerArray[i].arrayX[1], ball.y - playerArray[i].arrayY[1]];
     var unitFrontFaceVector=[];
     var projFrontVect=[];
     var closest=[];
 
-    for (var i=0; i<2; i++) {
-      unitFrontFaceVector[i] = frontFaceVector[i]/frontFaceMag;
+    for (var j=0; j<2; j++) {
+      unitFrontFaceVector[j] = frontFaceVector[j]/frontFaceMag;
     }
 
     var projFrontMag = math.dot(frontFacePtv, unitFrontFaceVector);
 
     if (projFrontMag < 0) {
-      closest = [arrayX[2], arrayY[2]];
+      closest = [playerArray[i].arrayX[0], playerArray[i].arrayY[0]];
     } else if (projFrontMag > frontFaceMag) {
-      closest = [arrayX[3], arrayY[3]];
+      closest = [playerArray[i].arrayX[1], playerArray[i].arrayY[1]];
     } else {
-      for (var i=0; i<2; i++) {
-        projFrontVect[i] = projFrontMag*unitFrontFaceVector[i];
+      for (var j=0; j<2; j++) {
+        projFrontVect[j] = projFrontMag*unitFrontFaceVector[j];
       }
-      closest = [arrayX[3] + projFrontVect[0] , arrayY[3] + projFrontVect[1]];
+      closest = [playerArray[i].arrayX[1] + projFrontVect[0] , playerArray[i].arrayY[1] + projFrontVect[1]];
     }
 
-    var distVect = [ball.x - closest[0], ball.y - closest[1]];
-    var distMag = math.hypot(distVect[0], distVect[1]);
+    distVect[i] = [ball.x - closest[0], ball.y - closest[1]];
+    distMag[i] = Math.hypot(distVect[i][0], distVect[i][1]);
 
-    return [distMag, projFrontMag];
+  }
+  return [distMag[0], distMag[1]];
 }
 
-function carFrontBallCollision() {
-  var frontFaceResult = frontFaceToBallCalc();
-  // if Contact
+// PASS IN output from frontFaceToBallCalc(), returns nothing, affects speed/direction of ball if impacted by a car
+function carFrontBallCollision(outputFromFrontFaceToBallCalc) {
+  for (var i=0; i < 2; i++) {
+    var frontFaceResult = outputFromFrontFaceToBallCalc[i];
 
-  if (frontFaceResult[0] < ball.radius) {
-    ball.color = "white";
-    var velMag;
-    var turnAngle = player1.rot*Math.PI/180;
-    var bounceAngle = Math.atan(ball.velY / (ball.velX + player1.vel));
+    // IF CONTACT OCCURS
+    if (frontFaceResult < ball.radius) {
+      // ball.color = "white";
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
 
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-    // if(player1.vel*Math.sin(player1.rot) > )
-      velMag = Math.hypot(ball.velY, (ball.velX + player1.vel));
-    // } else {
-    //   velMag = ball.velX + player1.vel;
-    // }
-    var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
-    // console.log("ballvXINITIAL = " +ball.velX);
-    ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
-    // console.log("turnAngle= " + turnAngle);
-    // console.log("bounceAngle" + bounceAngle);
-    // console.log("resultAngle" + resultAngle);
-    // console.log("velmag = " +velMag);
-    // console.log("ballvXFINAL = " +ball.velX);
-    // console.log("________________________________");
+      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
 
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-    ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-    /* CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-
-    player1.vel = player1.vel * .50;
+      // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
+      players[i].vel *= .50;
+    }
   }
 }
 
-function rightFaceToBallCalc() {
-  // right face collision
-    var rightFaceVector = [arrayX[2] - arrayX[0], arrayY[2] - arrayY[0]];
-    var rightFaceMag = player1.height;
-    var rightFacePtv = [ball.x - arrayX[0], ball.y - arrayY[0]];
+// PASS IN players[], returns perpendicular distance of both players from face to ball center
+function rightFaceToBallCalc(playerArray) {
+  var distVect = [];
+  var distMag = [];
+  for (var i=0; i < playerArray.length; i++) {
+    var rightFaceVector = [playerArray[i].arrayX[2] - playerArray[i].arrayX[0], playerArray[i].arrayY[2] - playerArray[i].arrayY[0]];
+    var rightFaceMag = playerArray[i].height;
+    var rightFacePtv = [ball.x - playerArray[i].arrayX[0], ball.y - playerArray[i].arrayY[0]];
     var unitRightFaceVector=[];
     var projRightVect=[];
     var closest=[];
 
-    for (var i=0; i<2; i++) {
-      unitRightFaceVector[i] = rightFaceVector[i]/rightFaceMag;
+    for (var j=0; j<2; j++) {
+      unitRightFaceVector[j] = rightFaceVector[j]/rightFaceMag;
     }
 
     var projRightMag = math.dot(rightFacePtv, unitRightFaceVector);
 
     if (projRightMag < 0) {
-      closest = [arrayX[2], arrayY[2]];
+      closest = [playerArray[i].arrayX[2], playerArray[i].arrayY[2]];
     } else if (projRightMag > rightFaceMag) {
-      closest = [arrayX[0], arrayY[0]];
+      closest = [playerArray[i].arrayX[0], playerArray[i].arrayY[0]];
     } else {
-      for (var i=0; i<2; i++) {
-        projRightVect[i] = projRightMag*unitRightFaceVector[i];
+      for (var j=0; j<2; j++) {
+        projRightVect[j] = projRightMag*unitRightFaceVector[j];
       }
-      closest = [arrayX[0] + projRightVect[0] , arrayY[0] + projRightVect[1]];
+      closest = [playerArray[i].arrayX[0] + projRightVect[0] , playerArray[i].arrayY[0] + projRightVect[1]];
     }
 
-    var distVect = [ball.x - closest[0], ball.y - closest[1]];
-    var distMag = Math.hypot(distVect[0], distVect[1]);
+    distVect[i] = [ball.x - closest[0], ball.y - closest[1]];
+    distMag[i] = Math.hypot(distVect[i][0], distVect[i][1]);
 
-    return [distMag, projRightMag];
+  }
+  return [distMag[0], distMag[1]];
 }
 
-function carRightBallCollision() {
-  var rightFaceResult = rightFaceToBallCalc();
-  // if Contact on right face
+// PASS IN output from rightFaceToBallCalc(), returns nothing, affects speed/direction of ball if impacted by a car
+function carRightBallCollision(outputFromRightFaceToBallCalc) {
+  for (var i=0; i < 2; i++) {
+    var rightFaceResult = outputFromRightFaceToBallCalc[i];
 
-  if (rightFaceResult[0] < ball.radius) {
-    ball.color = "red";
-    var velMag;
-    var turnAngle = player1.rot*Math.PI/180;
-    var bounceAngle = Math.atan(ball.velY / (ball.velX));
+    // IF CONTACT OCCURS
+    if (rightFaceResult < ball.radius) {
+      // ball.color = "red";
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
 
-      velMag = Math.hypot(ball.velY, ball.velX);
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-    var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
+      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
 
-    ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-    ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
-
-    /* CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-
-    player1.vel = player1.vel * .75;
+      // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
+      players[i].vel *= .8;
+    }
   }
 }
 
-function leftFaceToBallCalc() {
-  // left face collision
-    var leftFaceVector = [arrayX[1] - arrayX[3], arrayY[1] - arrayY[3]];
-    var leftFaceMag = player1.height;
-    var leftFacePtv = [ball.x - arrayX[3], ball.y - arrayY[3]];
+// PASS IN players[], returns perpendicular distance of both players from face to ball center
+function leftFaceToBallCalc(playerArray) {
+  var distVect = [];
+  var distMag = [];
+  for (var i=0; i < playerArray.length; i++) {
+    var leftFaceVector = [playerArray[i].arrayX[1] - playerArray[i].arrayX[3], playerArray[i].arrayY[1] - playerArray[i].arrayY[3]];
+    var leftFaceMag = playerArray[i].height;
+    var leftFacePtv = [ball.x - playerArray[i].arrayX[3], ball.y - playerArray[i].arrayY[3]];
     var unitLeftFaceVector=[];
     var projLeftVect=[];
     var closest=[];
 
-    for (var i=0; i<2; i++) {
-      unitLeftFaceVector[i] = leftFaceVector[i]/leftFaceMag;
+    for (var j=0; j<2; j++) {
+      unitLeftFaceVector[j] = leftFaceVector[j]/leftFaceMag;
     }
 
     var projLeftMag = math.dot(leftFacePtv, unitLeftFaceVector);
 
     if (projLeftMag < 0) {
-      closest = [arrayX[1], arrayY[1]];
+      closest = [playerArray[i].arrayX[1], playerArray[i].arrayY[1]];
     } else if (projLeftMag > leftFaceMag) {
-      closest = [arrayX[3], arrayY[3]];
+      closest = [playerArray[i].arrayX[3], playerArray[i].arrayY[3]];
     } else {
-      for (var i=0; i<2; i++) {
-        projLeftVect[i] = projLeftMag*unitLeftFaceVector[i];
+      for (var j=0; j<2; j++) {
+        projLeftVect[j] = projLeftMag*unitLeftFaceVector[j];
       }
-      closest = [arrayX[3] + projLeftVect[0] , arrayY[3] + projLeftVect[1]];
+      closest = [playerArray[i].arrayX[3] + projLeftVect[0] , playerArray[i].arrayY[3] + projLeftVect[1]];
     }
 
-    var distVect = [ball.x - closest[0], ball.y - closest[1]];
-    var distMag = Math.hypot(distVect[0], distVect[1]);
+    distVect[i] = [ball.x - closest[0], ball.y - closest[1]];
+    distMag[i] = Math.hypot(distVect[i][0], distVect[i][1]);
 
-    return [distMag, projLeftMag];
+  }
+  return [distMag[0], distMag[1]];
 }
 
-function carLeftBallCollision() {
-  var leftFaceResult = leftFaceToBallCalc();
-  // if Contact on left face
+// PASS IN output from leftFaceToBallCalc(), returns nothing, affects speed/direction of ball if impacted by a car
+function carLeftBallCollision(outputFromLeftFaceToBallCalc) {
+  for (var i=0; i < 2; i++) {
+    var leftFaceResult = outputFromLeftFaceToBallCalc[i];
 
-  if (leftFaceResult[0] <= ball.radius) {
-    // COLLISION DATA
-    console.log("+++++++++++++++++++++++++++++++++");
-    console.log("COLLISION");
-    console.log("initial ball.velX = " + ball.velX);
-    console.log("initial ball.velY = " + ball.velY);
-    ball.color = "green";
-    var velMag;
-    var turnAngle = player1.rot*Math.PI/180;
-    var bounceAngle = Math.atan(ball.velY / ball.velX);
-    console.log("turnAngle = " +turnAngle);
-    console.log("bounceAngle = " +bounceAngle);
+    // IF CONTACT OCCURS
+    if (leftFaceResult < ball.radius) {
+      // ball.color = "lime";
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
 
-      velMag = Math.hypot(ball.velY, ball.velX);
-    console.log("velMag = " + velMag);
-    var resultAngle = turnAngle + bounceAngle  - Math.PI/2;
-    console.log("resultAngle = " +resultAngle);
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-    ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
 
-    console.log("final ball.velX = " + ball.velX);
-    console.log("final ball.velY = " + ball.velY);
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-    // ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    // ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-    /* CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-
-    player1.vel = player1.vel * .75;
+      // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
+      players[i].vel *= .8;
+    }
   }
 }
 
-function bottomFaceToBallCalc() {
-  // bottom face collision
-    var bottomFaceVector = [arrayX[0] - arrayX[1], arrayY[0] - arrayY[1]];
-    var bottomFaceMag = player1.height;
-    var bottomFacePtv = [ball.x - arrayX[1], ball.y - arrayY[1]];
+// PASS IN players[], returns perpendicular distance of both players from face to ball center
+function bottomFaceToBallCalc(playerArray) {
+  var distVect = [];
+  var distMag = [];
+  for (var i=0; i < playerArray.length; i++) {
+    var bottomFaceVector = [playerArray[i].arrayX[2] - playerArray[i].arrayX[3], playerArray[i].arrayY[2] - playerArray[i].arrayY[3]];
+    var bottomFaceMag = playerArray[i].width;
+    var bottomFacePtv = [ball.x - playerArray[i].arrayX[3], ball.y - playerArray[i].arrayY[3]];
     var unitBottomFaceVector=[];
     var projBottomVect=[];
     var closest=[];
 
-    for (var i=0; i<2; i++) {
-      unitBottomFaceVector[i] = bottomFaceVector[i]/bottomFaceMag;
+    for (var j=0; j<2; j++) {
+      unitBottomFaceVector[j] = bottomFaceVector[j]/bottomFaceMag;
     }
 
     var projBottomMag = math.dot(bottomFacePtv, unitBottomFaceVector);
 
     if (projBottomMag < 0) {
-      closest = [arrayX[0], arrayY[0]];
+      closest = [playerArray[i].arrayX[2], playerArray[i].arrayY[2]];
     } else if (projBottomMag > bottomFaceMag) {
-      closest = [arrayX[1], arrayY[1]];
+      closest = [playerArray[i].arrayX[3], playerArray[i].arrayY[3]];
     } else {
-      for (var i=0; i<2; i++) {
-        projBottomVect[i] = projBottomMag*unitBottomFaceVector[i];
+      for (var j=0; j<2; j++) {
+        projBottomVect[j] = projBottomMag*unitBottomFaceVector[j];
       }
-      closest = [arrayX[1] + projBottomVect[0] , arrayY[1] + projBottomVect[1]];
+      closest = [playerArray[i].arrayX[3] + projBottomVect[0] , playerArray[i].arrayY[3] + projBottomVect[1]];
     }
 
-    var distVect = [ball.x - closest[0], ball.y - closest[1]];
-    var distMag = Math.hypot(distVect[0], distVect[1]);
+    distVect[i] = [ball.x - closest[0], ball.y - closest[1]];
+    distMag[i] = Math.hypot(distVect[i][0], distVect[i][1]);
 
-    return [distMag, projBottomMag];
+  }
+  return [distMag[0], distMag[1]];
 }
 
-function carBottomBallCollision() {
-  var bottomFaceResult = bottomFaceToBallCalc();
-  // if Contact on bottom face
+// PASS IN output from bottomFaceToBallCalc(), returns nothing, affects speed/direction of ball if impacted by a car
+function carBottomBallCollision(outputFromBottomFaceToBallCalc) {
+  for (var i=0; i < 2; i++) {
+    var bottomFaceResult = outputFromBottomFaceToBallCalc[i];
 
-  if (bottomFaceResult[0] < ball.radius) {
+    // IF CONTACT OCCURS
+    if (bottomFaceResult < ball.radius) {
+      // ball.color = "blue";
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
 
-    ball.color = "blue";
-    var velMag;
-    var turnAngle = player1.rot*Math.PI/180;
-    var bounceAngle = Math.atan(ball.velY / ball.velX);
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-      velMag = Math.hypot(ball.velY, ball.velX);
+      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
 
-    var resultAngle = turnAngle + bounceAngle + Math.PI;
+      ball.velX = velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-    ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-
-    ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-    ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
-
-    /* CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-
-    player1.vel = player1.vel * .75;
+      // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
+      players[i].vel *= .8;
+    }
   }
 }
 
@@ -534,76 +538,76 @@ function ballWallCollisionDetect() {
 /* CORNER HIT DETECTION */
 
 // TAKES ARRAY corner AND TESTS IF IT IS WITHIN THE BALL
-function testCornerInBall(corner) {
-  // corner[0] = x
-  // corner[1] = y
-  // Uses equation of a circle to calculate if corner lies within the ball
-  if (Math.pow(corner[0] - ball.x, 2) + Math.pow(corner[1] - ball.y, 2) < Math.pow(ball.radius, 2)) {
-    console.log("cornerDETECTED");
-    return true;
-  } else {
-    return false;
-  }
-}
+// function testCornerInBall(corner) {
+//   // corner[0] = x
+//   // corner[1] = y
+//   // Uses equation of a circle to calculate if corner lies within the ball
+//   if (Math.pow(corner[0] - ball.x, 2) + Math.pow(corner[1] - ball.y, 2) < Math.pow(ball.radius, 2)) {
+//     console.log("cornerDETECTED");
+//     return true;
+//   } else {
+//     return false;
+//   }
+// }
 
-/* CORNER HIT RESPONSE */
+// /* CORNER HIT RESPONSE */
 
-function northEastCornerHit() {
-  if (testCornerInBall(southEastCorner)) {
+// function northEastCornerHit() {
+//   if (testCornerInBall(southEastCorner)) {
 
-    ball.color = "orange";
-    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-  }
-}
+//     ball.color = "orange";
+//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+//   }
+// }
 
-function northWestCornerHit() {
-  if (testCornerInBall(southWestCorner)) {
+// function northWestCornerHit() {
+//   if (testCornerInBall(southWestCorner)) {
 
-    ball.color = "teal";
-    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-  }
-}
+//     ball.color = "teal";
+//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+//   }
+// }
 
-function southEastCornerHit() {
-  if (testCornerInBall(northEastCorner)) {
+// function southEastCornerHit() {
+//   if (testCornerInBall(northEastCorner)) {
 
-    ball.color = "chartreuse";
-    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-  }
-}
+//     ball.color = "chartreuse";
+//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+//   }
+// }
 
-function southWestCornerHit() {
-  if (testCornerInBall(northWestCorner)) {
+// function southWestCornerHit() {
+//   if (testCornerInBall(northWestCorner)) {
 
-    ball.color = "pink";
-    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-  }
-}
+//     ball.color = "pink";
+//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+//   }
+// }
 
-/* BALL SPEED DECAY */
+// /* BALL SPEED DECAY */
 
-function ballFriction() {
-  var ballVelMagTi = Math.hypot(ball.velX, ball.velY);
-  var velAngle = Math.atan(ball.velX/ball.velY);
-    if (ballVelMagTi > 1) {
-      // CONTROL DECELERATION DUE TO FRICTION HERE
-      var ballVelMagTf = ballVelMagTi - 1;
-      if (ball.velY > 0) {
-        ball.velY -= ballVelMagTi*Math.cos(velAngle) - ballVelMagTf*Math.cos(velAngle);
-      } else {
-        ball.velY += ballVelMagTi*Math.cos(velAngle) - ballVelMagTf*Math.cos(velAngle);
-      }
-      if (ball.velX > 0) {
-        ball.velX -= ballVelMagTi*Math.sin(velAngle) - ballVelMagTf*Math.sin(velAngle);
-      } else {
-        ball.velX += ballVelMagTi*Math.sin(velAngle) - ballVelMagTf*Math.sin(velAngle);
-      }
-    }
-  }
+// function ballFriction() {
+//   var ballVelMagTi = Math.hypot(ball.velX, ball.velY);
+//   var velAngle = Math.atan(ball.velX/ball.velY);
+//     if (ballVelMagTi > 1) {
+//       // CONTROL DECELERATION DUE TO FRICTION HERE
+//       var ballVelMagTf = ballVelMagTi - 1;
+//       if (ball.velY > 0) {
+//         ball.velY -= ballVelMagTi*Math.cos(velAngle) - ballVelMagTf*Math.cos(velAngle);
+//       } else {
+//         ball.velY += ballVelMagTi*Math.cos(velAngle) - ballVelMagTf*Math.cos(velAngle);
+//       }
+//       if (ball.velX > 0) {
+//         ball.velX -= ballVelMagTi*Math.sin(velAngle) - ballVelMagTf*Math.sin(velAngle);
+//       } else {
+//         ball.velX += ballVelMagTi*Math.sin(velAngle) - ballVelMagTf*Math.sin(velAngle);
+//       }
+//     }
+//   }
 
 // // SPEED DECAY FUNCTION CALL
 // setInterval(ballFriction, 600);
@@ -614,3 +618,4 @@ setInterval(function() {
   update();
   requestAnimationFrame(draw);
 }, 1000/FPS);
+
