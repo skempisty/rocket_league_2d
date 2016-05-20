@@ -9,7 +9,8 @@ canvasElement.appendTo('body');
 var players = [];
 var scoreOrange = 0;
 var scoreBlue = 0;
-var timerCount = 300; // 5 Minute Time Limit
+var timerCount = 120; // 2 Minute Time Limit
+var timerID;
 
 // DRAW
 function draw() {
@@ -104,6 +105,8 @@ function resetGame() {
 function startGame() {
   resetGame();
   setTimer();
+  $('.logo-timer').replaceWith('<div class="count-down">2:00</div>');
+  $('.center').css("height", "110px");
 }
 
 
@@ -590,11 +593,13 @@ setInterval(function() {
 
 // TIMER ACTION
 function setTimer() {
-  setInterval(function() {
+  timerID = setInterval(function() {
+    var timeRemaining = timerLogic(timerCount-1);
+    $('.count-down').text(timeRemaining[0] + ":" + timeRemaining[1]);
     if (timerCount > -1) {
     timerCount--;
     }
-    if (timerCount === 120) {
+    if (timerCount === 30) {
       $('.two-minute-warning').trigger("play");
     }
     if (timerCount <= 10 && timerCount > 0) {
@@ -608,13 +613,51 @@ function setTimer() {
       $('.game-over').trigger("play");
     }
     if (timerCount === -1) {
+      $('.count-down').text("0:00");
       gameOver();
+      clearInterval(timerID);
     }
   }, 1000);
 }
 
-function gameOver() {
+function timerLogic(timerCount) {
+  var minutes = Math.floor(timerCount/60);
+  var seconds = timerCount - minutes*60;
+  seconds = (seconds % 60 > 9) ? seconds % 60 : "0" + seconds % 60;
+  return [minutes, seconds];
+}
 
+function gameOver() {
+  clearInterval(timerID);
+  $('.game-over').toggleClass('hidden');
+  winnerAnnounce = $('.winner-announce');
+  if (scoreBlue > scoreOrange) {
+    winnerAnnounce.text("WINNER! BLUE");
+    winnerAnnounce.css("color", "blue");
+
+  } else if (scoreOrange > scoreBlue) {
+    winnerAnnounce.text("WINNER! ORANGE");
+    winnerAnnounce.css("color", "orange");
+  } else {
+    winnerAnnounce.text("TIE GAME!");
+    winnerAnnounce.css("color", "white");
+  }
+}
+
+function playAgain() {
+  resetGame();
+
+  // STOP time
+  clearInterval(timerID);
+  timerCount = 120;
+  $('.count-down').text("2:00");
+  setTimer();
+
+  // RESET Score
+  scoreOrange = 0;
+  scoreBlue = 0;
+  $('.orange').text(scoreOrange);
+  $('.blue').text(scoreBlue);
 }
 
 // FPS SETTING
@@ -629,5 +672,27 @@ setInterval(function() {
 $('.orange').text(scoreOrange);
 $('.blue').text(scoreBlue);
 
+/* EVENT LISTENERS */
+var playButton = $('.play-again');
+
+// CLICKING ON LOGO STARTS THE GAME
+$('.logo-timer').on("click", startGame);
+
+// play-again button CLICK
+playButton.on("click", function() {
+  playAgain();
+  $('.game-over').toggleClass('hidden');
+});
+
+// play-again button MOUSEOVER
+playButton.on("mouseover", function(event) {
+  playButton.css("background-color", "black");
+  playButton.css("color", "yellow");
+});
+
+playButton.on("mouseout", function(event) {
+  playButton.css("background-color", "yellow");
+  playButton.css("color", "black");
+});
 
 

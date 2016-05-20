@@ -30,6 +30,7 @@ canvas {
   background-size: 109.7% 107.7%;
   background-position: center;
   background-repeat: no-repeat;
+  z-index: -1
 }
 
 .center {
@@ -96,6 +97,66 @@ canvas {
   border-radius: 5%;
 }
 
-.hidden {
-  display: none;
+.count-down {
+  position: relative;
+  width: 324px;
+  height: 75px;
+  top: -25px;
+  border-radius: 5%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: black;
+  display: inline-block;
+  color: white;
+  font-size: 400%;
+  font-family: 'planerregular';
+  margin-top: 30px;
 }
+
+.game-over {
+
+  position: absolute;
+  width: 500px;
+  height: 400px;
+  background: gray;
+  left: 50%;
+  top: 55%;
+  margin-top: -250px;
+  margin-left: -250px;
+  border-radius: 10%;
+
+}
+
+.hidden {
+  display:none;
+}
+
+.play-again {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  margin-left: -100px;
+  width: 200px;
+  background-color: yellow; /* Green */
+  /*border: none;*/
+  color: black;
+  padding: 15px 32px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  font-family: 'planerregular';
+  border-radius: 10%;
+}
+
+.winner-announce {
+  position: absolute;
+  left: 50%;
+  top: 40px;
+  margin-left: -200px;
+  width: 400px;
+  height: 250px;
+  text-align: center;
+  font-size: 100px;
+  font-family: 'planerregular';
+}
+
