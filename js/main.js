@@ -18,8 +18,6 @@ function draw() {
     players[i].draw();
   }
   ball.draw();
-
-  // player2.draw();
 }
 
 // UPDATE
@@ -62,10 +60,9 @@ function update() {
   carRightBallCollision(rightFaceToBallCalc(players));
   carLeftBallCollision(leftFaceToBallCalc(players));
   carBottomBallCollision(bottomFaceToBallCalc(players));
-}
 
-// INITIALIZERS
-var thetaF = 0;
+  console.log("ballVelX = " + ball.velX + "   ballVelY = " + ball.velY);
+}
 
 /* PLAYER CONSTRUCTOR */
 
@@ -117,8 +114,6 @@ var ball = {
 
 
 function KeyboardController(keys, repeat) {
-    // Lookup of key codes to timer ID, or null for no repeat
-    //
     var timers= {};
 
     // When key is pressed and we don't already think it's pressed, call the
@@ -212,8 +207,16 @@ function carWallCollisionDetect() {
                        players[i].yMid + ((- players[i].width/2)*sinTheta) + ((-players[i].height/2)*cosTheta)
                        ];
 
-    players[i].arrayX = [players[i].northEastCorner[0], players[i].northWestCorner[0], players[i].southEastCorner[0], players[i].southWestCorner[0]];
-    players[i].arrayY = [players[i].northEastCorner[1], players[i].northWestCorner[1], players[i].southEastCorner[1], players[i].southWestCorner[1]];
+    players[i].arrayX = [players[i].northEastCorner[0],
+                         players[i].northWestCorner[0],
+                         players[i].southEastCorner[0],
+                         players[i].southWestCorner[0]
+                         ];
+    players[i].arrayY = [players[i].northEastCorner[1],
+                         players[i].northWestCorner[1],
+                         players[i].southEastCorner[1],
+                         players[i].southWestCorner[1]
+                         ];
 
     // Check X values
     for (var j=0; j < players[i].arrayX.length; j++) {
@@ -535,6 +538,28 @@ function ballWallCollisionDetect() {
   }
 }
 
+/* BALL SPEED DECAY */
+function ballFriction(friction) {
+  if (Math.hypot(ball.velX, ball.velY) > .5) {
+    ball.velX -= ball.velX*friction;
+    ball.velY -= ball.velY*friction;
+  }
+}
+
+// // SPEED DECAY FUNCTION CALL
+setInterval(function() {
+  ballFriction(.2)}, 600);
+
+// FPS SETTING
+var FPS = 60;
+setInterval(function() {
+  update();
+  requestAnimationFrame(draw);
+}, 1000/FPS);
+
+
+
+
 /* CORNER HIT DETECTION */
 
 // TAKES ARRAY corner AND TESTS IF IT IS WITHIN THE BALL
@@ -587,35 +612,4 @@ function ballWallCollisionDetect() {
 //     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
 //   }
 // }
-
-// /* BALL SPEED DECAY */
-
-// function ballFriction() {
-//   var ballVelMagTi = Math.hypot(ball.velX, ball.velY);
-//   var velAngle = Math.atan(ball.velX/ball.velY);
-//     if (ballVelMagTi > 1) {
-//       // CONTROL DECELERATION DUE TO FRICTION HERE
-//       var ballVelMagTf = ballVelMagTi - 1;
-//       if (ball.velY > 0) {
-//         ball.velY -= ballVelMagTi*Math.cos(velAngle) - ballVelMagTf*Math.cos(velAngle);
-//       } else {
-//         ball.velY += ballVelMagTi*Math.cos(velAngle) - ballVelMagTf*Math.cos(velAngle);
-//       }
-//       if (ball.velX > 0) {
-//         ball.velX -= ballVelMagTi*Math.sin(velAngle) - ballVelMagTf*Math.sin(velAngle);
-//       } else {
-//         ball.velX += ballVelMagTi*Math.sin(velAngle) - ballVelMagTf*Math.sin(velAngle);
-//       }
-//     }
-//   }
-
-// // SPEED DECAY FUNCTION CALL
-// setInterval(ballFriction, 600);
-
-// FPS SETTING
-var FPS = 60;
-setInterval(function() {
-  update();
-  requestAnimationFrame(draw);
-}, 1000/FPS);
 
