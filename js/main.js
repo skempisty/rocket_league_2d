@@ -1,5 +1,3 @@
-console.log("linked!");
-
 // SET CANVAS SIZE AND APPEND TO BODY
 var CANVAS_WIDTH = 1200;
 var CANVAS_HEIGHT = 555;
@@ -11,6 +9,7 @@ canvasElement.appendTo('body');
 var players = [];
 var scoreOrange = 0;
 var scoreBlue = 0;
+var timerCount = 300; // 5 Minute Time Limit
 
 // DRAW
 function draw() {
@@ -41,8 +40,6 @@ function update() {
   carRightBallCollision(rightFaceToBallCalc(players));
   carLeftBallCollision(leftFaceToBallCalc(players));
   carBottomBallCollision(bottomFaceToBallCalc(players));
-
-  console.log("speed p1 = " + players[0].vel);
 }
 
 /* PLAYER CONSTRUCTOR */
@@ -101,8 +98,13 @@ function resetGame() {
   ball.velY = 0;
   ball.draw();
 }
-// Calls resetGame to initialize game
-resetGame();
+
+/* STARTS GAME ON PRESS OF START BUTTON */
+
+function startGame() {
+  resetGame();
+  setTimer();
+}
 
 
 function KeyboardController(keys, repeat) {
@@ -302,8 +304,8 @@ function carFrontBallCollision(outputFromFrontFaceToBallCalc) {
       ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      ball.x += -2*velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -2*velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
       if (players[i].vel > 1.5) {
@@ -540,7 +542,6 @@ function ballWallCollisionDetect(bound) {
       // RESET STATE
       resetGame();
 
-
     } else {
       ball.velX = -ball.velX;
       while (ball.x - ball.radius <= 0) {
@@ -588,9 +589,33 @@ setInterval(function() {
 }, 500);
 
 // TIMER ACTION
-// setInterval(function() {
+function setTimer() {
+  setInterval(function() {
+    if (timerCount > -1) {
+    timerCount--;
+    }
+    if (timerCount === 120) {
+      $('.two-minute-warning').trigger("play");
+    }
+    if (timerCount <= 10 && timerCount > 0) {
+       //pause playing
+    $('.timer-running-out').trigger('pause');
+    //set play time to 0
+    $('.timer-running-out').prop("currentTime",0);
+      $('.timer-running-out').trigger("play");
+    }
+    if (timerCount === 0) {
+      $('.game-over').trigger("play");
+    }
+    if (timerCount === -1) {
+      gameOver();
+    }
+  }, 1000);
+}
 
-// }, 1000);
+function gameOver() {
+
+}
 
 // FPS SETTING
 var FPS = 60;
@@ -599,73 +624,10 @@ setInterval(function() {
   requestAnimationFrame(draw);
 }, 1000/FPS);
 
-/* DOM INTERACTION */
+/* DOM INITIALIZATION */
 
 $('.orange').text(scoreOrange);
 $('.blue').text(scoreBlue);
 
 
-
-/* CORNER HIT DETECTION */
-
-//TAKES ARRAY corner AND TESTS IF IT IS WITHIN THE BALL
-// function testCornerInBall(corner) {
-//   // corner[0] = x
-//   // corner[1] = y
-//   // Uses equation of a circle to calculate if corner lies within the ball
-//   if (Math.pow(corner[0] - ball.x, 2) + Math.pow(corner[1] - ball.y, 2) < Math.pow(ball.radius, 2)) {
-//     console.log("cornerDETECTED");
-//     return true;
-//   } else {
-//     return false;
-//   }
-// }
-
-// /* CORNER HIT RESPONSE */
-
-// function cornerHitResponse() {
-//   for (var i=0; i < players.length; i++) {
-//     if (testCornerInBall(players[i].northWestCorner) || testCornerInBall(players[i].northEastCorner) ||
-//         testCornerInBall(players[i].southWestCorner) || testCornerInBall(players[i].southEastCorner)) {
-//       ball.velX = -ball.velX*Math.atan;
-//       ball.velY = -ball.velY;
-//     }
-//   }
-// }
-
-// function northEastCornerHit() {
-//   if (testCornerInBall(southEastCorner)) {
-
-//     ball.color = "orange";
-//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-//   }
-// }
-
-// function northWestCornerHit() {
-//   if (testCornerInBall(southWestCorner)) {
-
-//     ball.color = "teal";
-//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-//   }
-// }
-
-// function southEastCornerHit() {
-//   if (testCornerInBall(northEastCorner)) {
-
-//     ball.color = "chartreuse";
-//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-//   }
-// }
-
-// function southWestCornerHit() {
-//   if (testCornerInBall(northWestCorner)) {
-
-//     ball.color = "pink";
-//     ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
-//     ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
-//   }
-// }
 
