@@ -307,13 +307,13 @@ function carFrontBallCollision(outputFromFrontFaceToBallCalc) {
       ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-      ball.x += -2*velMag * Math.roundTo(100000, Math.cos(resultAngle));
-      ball.y += -2*velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-      if (players[i].vel > 1.5) {
-        players[i].vel *= .50;
-      }
+      // if (players[i].vel > 1.5) {
+      //   players[i].vel *= .50;
+      // }
     }
   }
 }
