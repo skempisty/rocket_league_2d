@@ -4,8 +4,9 @@
 <br>
 <br>
 
-# ROCKET LEAGUE 2D 
+# ROCKET LEAGUE 2D v0.9
 ##(https://github.com/skempisty/rocket_league_2d)
+### Author: Stephen Kempisty
 
 ==========
 
