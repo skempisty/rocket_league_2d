@@ -37,6 +37,10 @@ function update() {
 
   ballWallCollisionDetect(180);
   carWallCollisionDetect();
+  northEastCornerHit();
+  northWestCornerHit();
+  southEastCornerHit();
+  southWestCornerHit();
   carFrontBallCollision(frontFaceToBallCalc(players));
   carRightBallCollision(rightFaceToBallCalc(players));
   carLeftBallCollision(leftFaceToBallCalc(players));
@@ -300,20 +304,14 @@ function carFrontBallCollision(outputFromFrontFaceToBallCalc) {
       var turnAngle = players[i].rot*Math.PI/180;
       var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
 
-      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
-
+      velMag = Math.hypot(ball.velY, (ball.velX + 1.5*players[i].vel));
       var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
 
       ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
-      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
-
-      // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-      // if (players[i].vel > 1.5) {
-      //   players[i].vel *= .50;
-      // }
+      ball.x += -2*velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -2*velMag * Math.roundTo(100000, Math.sin(resultAngle));
     }
   }
 }
@@ -496,19 +494,169 @@ function carBottomBallCollision(outputFromBottomFaceToBallCalc) {
 
       velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
 
-      var resultAngle = turnAngle + bounceAngle  - Math.PI/2;
+      var resultAngle = turnAngle + bounceAngle - Math.PI/2;
+
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+
+      ball.x += -2*velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -2*velMag * Math.roundTo(100000, Math.sin(resultAngle));
+    }
+  }
+}
+
+/* CORNER HIT DETECTION */
+
+// INPUT is the corner in array form [players[i].northEastCorner[0], players[i].northEastCorner[1]]
+// OUTPUT true of false depending on corner collision detected
+function testCornerInBall(corner) {
+  // Uses equation of a circle to calculate if corner lies within the ball
+  if (Math.pow(corner[0] - ball.x, 2) + Math.pow(corner[1] - ball.y, 2) < Math.pow(ball.radius, 2)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/* CORNER HIT RESPONSE */
+
+function northEastCornerHit() {
+  for (var i=0; i< players.length; i++) {
+    // DEFINES the northeast corner for both players
+    var corner = [players[i].arrayX[0], players[i].arrayY[0]];
+    if (testCornerInBall(corner) === true) {
+      $('.ball-hit').trigger("play");
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
+
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
+
+      var resultAngle = turnAngle + bounceAngle + Math.PI*3/4;
 
       ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
       ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
-
-      // CHANGE PLAYER SPEED REDUCTION AFTER HIT */
-      players[i].vel *= .9;
     }
   }
 }
+
+function northWestCornerHit() {
+  for (var i=0; i< players.length; i++) {
+    // DEFINES the northwest corner for both players
+    var corner = [players[i].arrayX[1], players[i].arrayY[1]];
+    if (testCornerInBall(corner) === true) {
+      $('.ball-hit').trigger("play");
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
+
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
+
+      var resultAngle = turnAngle + bounceAngle + Math.PI/4;
+
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+    }
+  }
+}
+
+function southEastCornerHit() {
+  for (var i=0; i< players.length; i++) {
+    // DEFINES the southeast corner for both players
+    var corner = [players[i].arrayX[2], players[i].arrayY[2]];
+    if (testCornerInBall(corner) === true) {
+      $('.ball-hit').trigger("play");
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
+
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
+
+      var resultAngle = turnAngle + bounceAngle - Math.PI*3/4;
+
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+    }
+  }
+}
+
+function southWestCornerHit() {
+  for (var i=0; i< players.length; i++) {
+    // DEFINES the southwest corner for both players
+    var corner = [players[i].arrayX[3], players[i].arrayY[3]];
+    if (testCornerInBall(corner) === true) {
+      $('.ball-hit').trigger("play");
+      var velMag;
+      var turnAngle = players[i].rot*Math.PI/180;
+      var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
+
+      velMag = Math.hypot(ball.velY, (ball.velX + players[i].vel));
+
+      var resultAngle = turnAngle + bounceAngle - Math.PI/4;
+
+      ball.velX = -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.velY = -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+
+      ball.x += -velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -velMag * Math.roundTo(100000, Math.sin(resultAngle));
+    }
+  }
+}
+
+ // +function northEastCornerHit() {
+ // +  if (testCornerInBall(southEastCorner)) {
+ // +
+ // +    ball.color = "orange";
+ // +    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+ // +    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+ // +  }
+ // +}
+ // +
+ // +function northWestCornerHit() {
+ // +  if (testCornerInBall(southWestCorner)) {
+ // +
+ // +    ball.color = "teal";
+ // +    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+ // +    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+ // +  }
+ // +}
+ // +
+ // +function southEastCornerHit() {
+ // +  if (testCornerInBall(northEastCorner)) {
+ // +
+ // +    ball.color = "chartreuse";
+ // +    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+ // +    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+ // +  }
+ // +}
+ // +
+ // +function southWestCornerHit() {
+ // +  if (testCornerInBall(northWestCorner)) {
+ // +
+ // +    ball.color = "pink";
+ // +    ball.velY += -player1.vel*Math.cos(player1.rot*Math.PI/180);
+ // +    ball.velX += player1.vel*Math.sin(player1.rot*Math.PI/180);
+ // +  }
+ // +}
+
+
+
+
+
+
+
+
+
+
 
 function ballWallCollisionDetect(bound) {
   if (ball.x + ball.radius >= CANVAS_WIDTH) {
