@@ -160,3 +160,16 @@ canvas {
   font-family: 'planerregular';
 }
 
+.start-button {
+  background: green;
+  width: auto;
+  position: absolute;
+  top: 20px;
+  left: 75%;
+  font-family: planerregular;
+  color: white;
+  font-size: 225%;
+  padding: 10px;
+  border: solid red 2px;
+}
+

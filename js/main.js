@@ -35,16 +35,26 @@ function update() {
   ball.x += ball.velX;
   ball.y += ball.velY;
 
+  //// DEFINES GOALS AND EDGE OF ARENA
+  // input -> goal width
   ballWallCollisionDetect(180);
   carWallCollisionDetect();
+  // console.log("PLAYER 1 NE: " + players[0].northEastCorner);
+  //// Updates position of all corners of both vehicles
   northEastCornerHit();
   northWestCornerHit();
   southEastCornerHit();
   southWestCornerHit();
+  // ------------------------------------------------
+  //// CAR TO BALL COLLISION REACTION (DETECTION(PLAYERS ARRAY))
   carFrontBallCollision(frontFaceToBallCalc(players));
   carRightBallCollision(rightFaceToBallCalc(players));
   carLeftBallCollision(leftFaceToBallCalc(players));
   carBottomBallCollision(bottomFaceToBallCalc(players));
+  //////////////////////////////////////
+  /////TO BE ADDED//////////////////////
+  //////////////////////////////////////
+  //// CAR TO CAR COLLISION REACTION (DETECTION (PLAYERS ARRAY))
 }
 
 /* PLAYER CONSTRUCTOR */
@@ -109,6 +119,7 @@ function resetGame() {
 function startGame() {
   resetGame();
   setTimer();
+  $('.start-button').css("display", "none");
   $('.logo-timer').replaceWith('<div class="count-down">2:00</div>');
   $('.center').css("height", "110px");
 }
@@ -282,7 +293,7 @@ $('.blue').text(scoreBlue);
 var playButton = $('.play-again');
 
 // CLICKING ON LOGO STARTS THE GAME
-$('.logo-timer').on("click", startGame);
+$('.start-button').on("click", startGame);
 
 // play-again button CLICK
 playButton.on("click", function() {
