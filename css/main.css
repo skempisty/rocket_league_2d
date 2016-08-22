@@ -170,6 +170,8 @@ canvas {
   color: white;
   font-size: 225%;
   padding: 10px;
-  border: solid red 2px;
+  border: solid white 2px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 

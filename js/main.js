@@ -292,8 +292,14 @@ $('.blue').text(scoreBlue);
 /* EVENT LISTENERS */
 var playButton = $('.play-again');
 
-// CLICKING ON LOGO STARTS THE GAME
-$('.start-button').on("click", startGame);
+// START BUTTON
+$startButton = $('.start-button');
+$startButton.on("click", startGame);
+$startButton.hover(function(event) {
+  $startButton.css("background", "darkgreen");
+}, function(event) {
+  $startButton.css("background", "green");
+});
 
 // play-again button CLICK
 playButton.on("click", function() {
@@ -301,13 +307,11 @@ playButton.on("click", function() {
   $('.game-over').toggleClass('hidden');
 });
 
-// play-again button MOUSEOVER
-playButton.on("mouseover", function(event) {
+// PLAY AGAIN? BUTTON
+playButton.hover(function(event) {
   playButton.css("background-color", "black");
   playButton.css("color", "yellow");
-});
-
-playButton.on("mouseout", function(event) {
+}, function(event) {
   playButton.css("background-color", "yellow");
   playButton.css("color", "black");
 });
