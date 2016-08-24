@@ -83,6 +83,12 @@ function Player(color, xInitial, yInitial, rotInitial, colorPath) {
 
 /* DEFINE BALL OBJECT */
 
+var ballDrawing = new Image();
+ballDrawing.onload = function () {
+  ball.draw();
+}
+ballDrawing.src = "assets/RLball.png";
+
 var ball = {
   x: CANVAS_WIDTH/2,
   y: CANVAS_HEIGHT/2,
@@ -90,8 +96,11 @@ var ball = {
   velX: 0,
   velY: 0,
   draw: function() {
-    var ballDrawing = new Image();
-    ballDrawing.src = "assets/RLball.png";
+    // var ballDrawing = new Image();
+    // ballDrawing.onload = function () {
+    //   ball.draw();
+    // }
+    // ballDrawing.src = "assets/RLball.png";
     canvas.drawImage(ballDrawing, this.x-this.radius, this.y-this.radius, this.radius*2, this.radius*2);
   }
 }
