@@ -91,7 +91,7 @@ var ball = {
   velY: 0,
   draw: function() {
     var ballDrawing = new Image();
-    ballDrawing.src = "/assets/RLball.png";
+    ballDrawing.src = "assets/RLball.png";
     canvas.drawImage(ballDrawing, this.x-this.radius, this.y-this.radius, this.radius*2, this.radius*2);
   }
 }
