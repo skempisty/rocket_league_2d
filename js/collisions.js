@@ -51,13 +51,13 @@ function carFrontBallCollision(outputFromFrontFaceToBallCalc) {
       var bounceAngle = Math.atan(ball.velY / (ball.velX + players[i].vel));
 
       velMag = Math.hypot(ball.velY, (ball.velX + 1.5*players[i].vel));
-      var resultAngle = turnAngle + bounceAngle  + Math.PI/2;
+      var resultAngle = turnAngle + bounceAngle + Math.PI/2;
 
       ball.velX = -1*velMag * Math.roundTo(100000, Math.cos(resultAngle));
       ball.velY = -1*velMag * Math.roundTo(100000, Math.sin(resultAngle));
 
-      ball.x += -1.5*velMag * Math.roundTo(100000, Math.cos(resultAngle));
-      ball.y += -1.5*velMag * Math.roundTo(100000, Math.sin(resultAngle));
+      ball.x += -2.5*velMag * Math.roundTo(100000, Math.cos(resultAngle));
+      ball.y += -2.5*velMag * Math.roundTo(100000, Math.sin(resultAngle));
     }
   }
 }
@@ -380,10 +380,10 @@ function ballWallCollisionDetect(bound) {
       resetGame();
 
     } else {
-      ball.velX = -ball.velX;
       while (ball.x + ball.radius >= CANVAS_WIDTH) {
         ball.x -= 2;
       }
+      ball.velX = -ball.velX;
       ball.velX += .5;
     }
   }
@@ -403,25 +403,26 @@ function ballWallCollisionDetect(bound) {
       resetGame();
 
     } else {
-      ball.velX = -ball.velX;
+
       while (ball.x - ball.radius <= 0) {
         ball.x += 2;
       }
+      ball.velX = -ball.velX;
       ball.velX -= .5;
     }
   }
   if (ball.y + ball.radius >= CANVAS_HEIGHT) {
-    ball.velY = -ball.velY;
     while (ball.y + ball.radius >= CANVAS_HEIGHT) {
       ball.y -= 2;
     }
+    ball.velY = -ball.velY;
     ball.velY += .5;
   }
   if (ball.y - ball.radius <= 0) {
-    ball.velY = -ball.velY;
     while (ball.y - ball.radius <= 0) {
       ball.y += 2;
     }
+    ball.velY = -ball.velY;
     ball.velY -= .5;
   }
 }

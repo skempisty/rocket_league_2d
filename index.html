@@ -15,6 +15,8 @@
 <audio src="assets/two-minute-warning.ogg" class="two-minute-warning"></audio>
 <audio src="assets/timer-running-out.ogg" class="timer-running-out"></audio>
 <audio src="assets/game-over.ogg" class="game-over"></audio>
+
+<!-- ScoreBoard and Timer -->
 <div>
   <div class="center">
     <div class="scoreboard orange"></div>
@@ -27,14 +29,51 @@
     <div class="scoreboard blue"></div>
   </div>
 </div>
-  <div class="start-button">
-    Start Game
-  </div>
 
+<!-- Start Match Button -->
+<div class="start-button">
+  Start Match
+</div>
+
+<!-- Play Instructions -->
+<div class="instructions">
+  <div class="controls">
+    Controls
+  </div>
+  <div id="control-diagram">
+    <div class="car-image">
+      <img src="/assets/Car_orange.png" alt="">
+    </div>
+    <div id="orange-controls">
+      <p>W</p>
+      <p>S</p>
+      <p>A</p>
+      <p>D</p>
+    </div>
+    <div id="controls-text">
+      <p>Accelerate</p>
+      <p>Brake/Reverse</p>
+      <p>Turn Left</p>
+      <p>Turn Right</p>
+    </div>
+    <div id="blue-controls">
+      <p>&uarr;</p>
+      <p>&darr;</p>
+      <p>&larr;</p>
+      <p>&rarr;</p>
+    </div>
+    <div class="car-image">
+      <img src="/assets/Car_blue.png" alt="">
+    </div>
+  </div>
+</div>
+
+<!-- Pop up on Game Over -->
 <div class="game-over hidden">
   <div class="winner-announce"></div>
   <button class="play-again">Play Again?</button>
 </div>
+
 <script src="js/main.js"></script>
 <script src="js/collisions.js"></script>
 <script src="js/car_wall_collision.js"></script>

@@ -175,3 +175,57 @@ canvas {
   cursor: pointer;
 }
 
+.instructions {
+  font-family: planerregular;
+  position: absolute;
+  height: 200px;
+  width: 500px;
+  margin-left: -260px;
+  left: 50%;
+  top: 125px;
+  color: white;
+  background: rgba(0,0,0,.6);
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.controls {
+  font-size: 200%;
+  font-weight: bolder;
+}
+
+.car-image {
+  position: relative;
+  display: inline-block;
+  width: auto;
+}
+
+.car-image img {
+  width: 50px;
+}
+
+#orange-controls {
+  position: relative;
+  display: inline-block;
+  text-align: right;
+  width: 10%;
+}
+
+#controls-text {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  width: 35%;
+  margin: 10px;
+  margin-top: 0px;
+}
+
+#blue-controls {
+  position: relative;
+  display: inline-block;
+  text-align: left;
+  width: 10%;
+}
+
+

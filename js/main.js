@@ -84,18 +84,15 @@ function Player(color, xInitial, yInitial, rotInitial, colorPath) {
 /* DEFINE BALL OBJECT */
 
 var ball = {
-  color: "black",
   x: CANVAS_WIDTH/2,
   y: CANVAS_HEIGHT/2,
   radius: 30,
   velX: 0,
   velY: 0,
   draw: function() {
-    canvas.beginPath();
-    canvas.arc(this.x, this.y, ball.radius, 0, 2*Math.PI);
-    canvas.fillStyle = this.color;
-    canvas.fill();
-    canvas.stroke();
+    var ballDrawing = new Image();
+    ballDrawing.src = "/assets/RLball.png";
+    canvas.drawImage(ballDrawing, this.x-this.radius, this.y-this.radius, this.radius*2, this.radius*2);
   }
 }
 
@@ -292,14 +289,21 @@ $('.blue').text(scoreBlue);
 /* EVENT LISTENERS */
 var playButton = $('.play-again');
 
+// Instructions Pane
+$instructions = $('.instructions');
+
 // START BUTTON
 $startButton = $('.start-button');
-$startButton.on("click", startGame);
+$startButton.on("click", function() {
+  startGame();
+  $instructions.toggleClass('hidden');
+});
 $startButton.hover(function(event) {
   $startButton.css("background", "darkgreen");
 }, function(event) {
   $startButton.css("background", "green");
 });
+
 
 // play-again button CLICK
 playButton.on("click", function() {
