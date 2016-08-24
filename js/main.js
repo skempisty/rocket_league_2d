@@ -19,10 +19,10 @@ function draw() {
   canvas.fillRect(0,0,CANVAS_WIDTH/2,CANVAS_HEIGHT);
   canvas.fillStyle = "rgba(0, 0, 255, .5)";
   canvas.fillRect(CANVAS_WIDTH/2,0,CANVAS_WIDTH/2,CANVAS_HEIGHT);
+  ball.draw();
   for (var i=0; i<players.length; i++) {
     players[i].draw();
   }
-  ball.draw();
 }
 
 // UPDATE
@@ -39,22 +39,16 @@ function update() {
   // input -> goal width
   ballWallCollisionDetect(180);
   carWallCollisionDetect();
-  // console.log("PLAYER 1 NE: " + players[0].northEastCorner);
-  //// Updates position of all corners of both vehicles
-  northEastCornerHit();
-  northWestCornerHit();
-  southEastCornerHit();
-  southWestCornerHit();
-  // ------------------------------------------------
   //// CAR TO BALL COLLISION REACTION (DETECTION(PLAYERS ARRAY))
   carFrontBallCollision(frontFaceToBallCalc(players));
   carRightBallCollision(rightFaceToBallCalc(players));
   carLeftBallCollision(leftFaceToBallCalc(players));
   carBottomBallCollision(bottomFaceToBallCalc(players));
-  //////////////////////////////////////
-  /////TO BE ADDED//////////////////////
-  //////////////////////////////////////
-  //// CAR TO CAR COLLISION REACTION (DETECTION (PLAYERS ARRAY))
+  //// Updates position of all corners of both vehicles
+  northEastCornerHit();
+  northWestCornerHit();
+  southEastCornerHit();
+  southWestCornerHit();
 }
 
 /* PLAYER CONSTRUCTOR */
@@ -83,6 +77,7 @@ function Player(color, xInitial, yInitial, rotInitial, colorPath) {
 
 /* DEFINE BALL OBJECT */
 
+// caching ball image outside of draw function so it only loads once
 var ballDrawing = new Image();
 ballDrawing.onload = function () {
   ball.draw();
@@ -96,11 +91,6 @@ var ball = {
   velX: 0,
   velY: 0,
   draw: function() {
-    // var ballDrawing = new Image();
-    // ballDrawing.onload = function () {
-    //   ball.draw();
-    // }
-    // ballDrawing.src = "assets/RLball.png";
     canvas.drawImage(ballDrawing, this.x-this.radius, this.y-this.radius, this.radius*2, this.radius*2);
   }
 }
